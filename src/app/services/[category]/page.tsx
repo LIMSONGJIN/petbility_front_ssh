@@ -147,8 +147,11 @@ export default function ServiceCategoryPage() {
 
       <div className="flex justify-center">
         {/* 타이포그래픽 문구 */}
-        <p className="relative text-center text-2xl font-thin max-w-[600px] leading-[1.4] px-2 mt-12 text-violet-600 before:content-['“'] before:absolute before:left-[-2rem] before:top-[-1rem] before:text-[8rem] before:text-gray-200 after:content-['”'] after:absolute after:right-[-2rem] after:bottom-[0.5rem] after:text-[8rem] after:text-gray-200">
-          {service.tagline}
+        <p className="typography">
+          여러분들의 반려동물에게 최고의 장례를 선사하세요. <br />
+          Petbility와 함께라면, 반려동물과의 마지막 순간이 <br /> 특별한 시간이
+          될 것입니다.
+          <br /> 지금 바로 Petbility의 프리미엄 장례 서비스를 경험해보세요!
         </p>
       </div>
     </section>

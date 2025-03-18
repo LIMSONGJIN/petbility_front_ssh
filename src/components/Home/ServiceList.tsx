@@ -58,9 +58,12 @@ const services = [
 export default function ServiceList() {
   return (
     <section className="container mx-auto py-16 px-6">
-      <h2 className="text-3xl font-bold text-gray-800 text-center mb-8">
+      <h2 className="text-3xl font-bold text-gray-800 text-center mb-2">
         반려동물 서비스
       </h2>
+      <p className="text-center text-gray-600 mb-8">
+        소중한 반려동물을 위한 특별한 서비스입니다.
+      </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {services.map((service) => (
