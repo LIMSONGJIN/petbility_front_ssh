@@ -16,12 +16,19 @@ export default function ServicesHome() {
         {services.map((service) => (
           <div
             key={service.href}
-            className="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition-all"
+            className="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition-all flex flex-col justify-between"
           >
             <h3 className="text-xl font-semibold text-gray-800 mb-2">
               {service.name}
             </h3>
-            <p className="text-gray-600 text-sm mb-4">{service.description}</p>
+            <div>
+              <p className="text-gray-600 text-sm mb-4">
+                {service.description}
+              </p>
+              <p className="text-gray-600 text-sm mb-4">
+                {service.description2}
+              </p>
+            </div>
             <Link
               href={service.href}
               className="text-violet-600 font-semibold hover:underline"
@@ -47,7 +54,9 @@ const services = [
   {
     name: "그루밍 서비스",
     href: "/services/grooming",
-    description: "목욕과 미용을 결합한 프리미엄 반려동물 그루밍 서비스",
+    description:
+      "Petbility의 반려동물 그루밍 서비스는 여러분의 소중한 가족 구성원에게 최상의 관리를 제공할 것을 약속드리며,",
+    description2: "전문가의 세심한 손길로 반려동물의 케어를 책임집니다.",
   },
   {
     name: "맞춤형 차량 제작",
