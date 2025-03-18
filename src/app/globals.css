@@ -1,0 +1,199 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&family=Merriweather:wght@400;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: "Noto Sans KR", "Merriweather", sans-serif;
+}
+
+@layer base {
+  :root {
+    /* 🌟 기본 컬러 (밝은 테마) */
+    --background: 39 50% 96%; /* 크림 베이지 */
+    --foreground: 220 15% 20%; /* 차콜 블루 */
+
+    --card: 39 45% 92%; /* 밝은 베이지 */
+    --card-foreground: 220 15% 20%;
+
+    --primary: 220 15% 20%; /* 차콜 블루 */
+    --primary-foreground: 39 50% 96%;
+
+    --secondary: 30 20% 85%; /* 웜 그레이 */
+    --secondary-foreground: 220 15% 20%;
+
+    --muted: 30 15% 80%;
+    --muted-foreground: 220 10% 35%;
+
+    --accent: 0 75% 65%; /* 코랄 오렌지 */
+    --accent-foreground: 39 50% 96%;
+
+    --destructive: 0 65% 55%;
+    --destructive-foreground: 39 50% 96%;
+
+    --border: 30 20% 80%;
+    --input: 30 20% 80%;
+    --ring: 220 15% 20%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* 🌙 다크 모드 컬러 */
+    --background: 220 15% 10%;
+    --foreground: 39 50% 96%;
+
+    --card: 220 15% 15%;
+    --card-foreground: 39 50% 96%;
+
+    --primary: 39 50% 96%;
+    --primary-foreground: 220 15% 10%;
+
+    --secondary: 220 15% 25%;
+    --secondary-foreground: 39 50% 96%;
+
+    --muted: 220 10% 30%;
+    --muted-foreground: 39 50% 90%;
+
+    --accent: 0 75% 55%;
+    --accent-foreground: 39 50% 96%;
+
+    --destructive: 0 65% 45%;
+    --destructive-foreground: 39 50% 96%;
+
+    --border: 220 15% 25%;
+    --input: 220 15% 25%;
+    --ring: 39 50% 96%;
+  }
+}
+
+/* 기본 요소 스타일 */
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* 추가 컴포넌트 스타일 */
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-primary-foreground px-4 py-2 rounded-md shadow-md hover:bg-accent transition;
+  }
+
+  .sign-container {
+    @apply flex flex-col gap-2 p-8 items-center justify-center min-h-screen;
+  }
+
+  .sign-form {
+    @apply flex flex-col gap-3 bg-white p-6 rounded-lg shadow-lg h-full w-full max-w-2xl;
+  }
+
+  .sign-btn {
+    @apply border-violet-500 border rounded px-3 py-2 bg-violet-500 text-white hover:bg-white hover:text-violet-500 disabled:bg-gray-400 transition-all ease-linear;
+  }
+
+  .sign-up-div {
+    @apply w-full flex justify-between items-center gap-4;
+  }
+
+  .sign-input {
+    @apply border rounded px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-violet-500 w-full;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground px-4 py-2 rounded-md shadow-md hover:bg-accent transition;
+  }
+
+  .card {
+    @apply bg-card text-card-foreground p-6 rounded-lg shadow-md;
+  }
+
+  .input-field {
+    @apply border border-input px-3 py-2 rounded-md focus:outline-none focus:border-accent transition;
+  }
+
+  .header-btn-text {
+    @apply p-2 text-gray-700 hover:text-purple-600;
+  }
+
+  .header-profile-link {
+    @apply block px-4 header-btn-text hover:bg-gray-100 transition;
+  }
+}
+@layer utilities {
+  .button--nina {
+    position: relative;
+    display: inline-block;
+    background: #fff;
+    color: #7c3aed;
+    overflow: hidden;
+    transition: background-color 0.3s;
+  }
+
+  /* ✅ `::before`는 `Link` 태그에서 data-text 값 가져오기 */
+  .button--nina::before {
+    content: attr(data-text);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    transform: translate(-50%, -50%); /* 가로세로 정중앙 정렬 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s, opacity 0.3s;
+    transition-timing-function: cubic-bezier(0.75, 0, 0.125, 1);
+  }
+
+  .button--nina:hover {
+    background-color: #7c3aed;
+    color: #fff;
+  }
+
+  .button--nina:hover::before {
+    opacity: 0;
+    transform: translate3d(0, 100%, 0);
+  }
+
+  .button--nina > button > span {
+    display: inline-block;
+    opacity: 0;
+    color: #fff;
+    transform: translate3d(0, -10px, 0);
+    transition: transform 0.3s, opacity 0.3s;
+    transition-timing-function: cubic-bezier(0.75, 0, 0.125, 1);
+  }
+
+  .button--nina:hover > button > span {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  .button--nina:hover > button > span:nth-child(1) {
+    transition-delay: 0.045s;
+  }
+  .button--nina:hover > button > span:nth-child(2) {
+    transition-delay: 0.09s;
+  }
+  .button--nina:hover > button > span:nth-child(3) {
+    transition-delay: 0.135s;
+  }
+  .button--nina:hover > button > span:nth-child(4) {
+    transition-delay: 0.18s;
+  }
+  .button--nina:hover > button > span:nth-child(5) {
+    transition-delay: 0.225s;
+  }
+  .dropdown-menu {
+    @apply relative text-gray-700 hover:text-purple-600 transition duration-300 
+    after:content-[''] after:absolute after:left-0 after:top-[45px] 
+    after:w-full after:h-[3px] after:bg-violet-300 after:opacity-0 
+    after:transform after:translate-y-1 
+    hover:after:opacity-100 hover:after:translate-y-0 after:transition-all after:duration-300 text-lg font-[550];
+  }
+}
