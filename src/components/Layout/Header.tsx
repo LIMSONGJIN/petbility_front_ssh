@@ -34,15 +34,18 @@ const navLinks = [
     href: "/community",
     name: "추모 공간",
     submenu: [
+      { name: "공지사항", href: "/community/notice" },
       { name: "메타버스 공간", href: "/community/metaverse" },
       { name: "온라인 추모 갤러리", href: "/community/memorial-gallery" },
-      { name: "공지사항", href: "/community/notice" },
     ],
   },
   {
     href: "/shop",
     name: "애견샵",
-    submenu: [{ name: "용품샵", href: "/shop/pet-store" }],
+    submenu: [
+      { name: "용품샵", href: "/shop/pet-store" },
+      { name: "식품샵", href: "/shop/food-store" },
+    ],
   },
 ];
 

@@ -279,6 +279,27 @@ const reviews = [
   },
 ];
 
+export const comments = [
+  {
+    comment_id: "1",
+    post_id: "1",
+    user_id: "user-201",
+    content: "루루가 좋은 곳에서 행복하길 바라요 😢",
+    likes: 15,
+    report_count: 0,
+    created_at: "2024-03-11T10:00:00Z",
+  },
+  {
+    comment_id: "2",
+    post_id: "1",
+    user_id: "user-202",
+    content: "저도 반려견을 떠나보냈는데... 공감됩니다 🐶",
+    likes: 12,
+    report_count: 0,
+    created_at: "2024-03-11T12:00:00Z",
+  },
+];
+
 export const services = serviceList;
 export const memorials = memorialPosts;
 export const products = bestProducts;
