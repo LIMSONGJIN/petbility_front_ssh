@@ -112,7 +112,7 @@ export default function ReservationList() {
         {filteredServices.map((service) => (
           <Link
             key={service.service_id}
-            href={`/reservations/detail/${service.service_id}`}
+            href={`/reservations/${service.service_id}`}
           >
             <div className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-all cursor-pointer">
               <h3 className="text-xl font-semibold text-gray-800">

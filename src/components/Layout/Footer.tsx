@@ -20,7 +20,7 @@ const footerLinks2 = [
 export default function Footer() {
   return (
     <footer className="w-full bg-gray-900 text-white py-4">
-      <div className="container mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 px-6">
+      <div className="container mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 px-6">
         {/* 회사 정보 */}
         <div>
           <h3 className="text-lg font-semibold mb-3">펫빌리티</h3>
@@ -67,42 +67,26 @@ export default function Footer() {
         {/* SNS & 뉴스레터 */}
         <div>
           <h3 className="text-lg font-semibold mb-3">팔로우 & 구독</h3>
-          <div className="flex space-x-4">
-            <a
+          <div className="flex flex-col gap-2">
+            <Link
               href="#"
               className="flex items-center text-sm hover:text-violet-400 transition"
             >
               <Facebook size={16} className="mr-1 text-blue-500" /> Facebook
-            </a>
-            <a
+            </Link>
+            <Link
               href="#"
               className="flex items-center text-sm hover:text-violet-400 transition"
             >
               <Instagram size={16} className="mr-1 text-pink-500" /> Instagram
-            </a>
-            <a
+            </Link>
+            <Link
               href="#"
               className="flex items-center text-sm hover:text-violet-400 transition"
             >
               <Twitter size={16} className="mr-1 text-blue-400" /> Twitter
-            </a>
+            </Link>
           </div>
-          <form className="mt-4">
-            <div className="relative">
-              <input
-                type="email"
-                placeholder="이메일 구독"
-                className="w-full p-2 pl-10 rounded bg-gray-800 text-white border border-gray-600 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition"
-              />
-              <Mail
-                size={18}
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-              />
-            </div>
-            <button className="w-full mt-2 p-2 bg-violet-500 hover:bg-violet-600 rounded transition">
-              구독하기
-            </button>
-          </form>
         </div>
       </div>
 

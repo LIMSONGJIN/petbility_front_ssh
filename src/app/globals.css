@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&family=Merriweather:wght@400;700&display=swap");
+@import url("//fonts.googleapis.com/earlyaccess/nanumbrushscript.css");
 
 @tailwind base;
 @tailwind components;
@@ -6,6 +7,12 @@
 
 body {
   font-family: "Noto Sans KR", "Merriweather", sans-serif;
+}
+
+.font-nanumbrush {
+  font-family: "Nanum Brush Script", cursive;
+  font-size: 22px;
+  font-style: oblique;
 }
 
 @layer base {
@@ -191,28 +198,36 @@ body {
   }
   .dropdown-menu {
     @apply relative text-gray-700 hover:text-purple-600 transition duration-300 
-    after:content-[''] after:absolute after:left-0 after:top-[45px] 
+    after:content-[''] after:absolute after:left-0 after:top-[43px] 
     after:w-full after:h-[3px] after:bg-violet-300 after:opacity-0 
     after:transform after:translate-y-1 
-    hover:after:opacity-100 hover:after:translate-y-0 after:transition-all after:duration-300 text-lg font-[550];
+    hover:after:opacity-100 hover:after:translate-y-0 after:transition-all after:duration-300 text-base font-[550];
+  }
+
+  .dropdown-menu-active {
+    @apply relative text-violet-500 hover:text-purple-600 transition duration-300 
+    after:content-[''] after:absolute after:left-0 after:top-[43px] 
+    after:w-full after:h-[3px] after:bg-violet-300 after:opacity-0 
+    after:transform after:translate-y-1 
+    hover:after:opacity-100 hover:after:translate-y-0 after:transition-all after:duration-300 text-base font-[550];
   }
   /* globals.css */
   .typography {
     position: relative;
     text-align: center;
-    font-size: 1.1rem; /* Tailwind의 text-2xl */
+    font-size: 22px; /* Tailwind의 text-2xl */
     font-weight: 100; /* Tailwind의 font-thin */
     max-width: 600px;
     line-height: 1.4;
     padding: 0.5rem;
     margin-top: 3rem; /* Tailwind의 mt-12 */
-    color: #7c3aed; /* Tailwind의 text-violet-600 */
+    color: #000; /* Tailwind의 text-violet-600 */
   }
 
   .typography::before,
   .typography::after {
     position: absolute;
-    color: #e5e7eb; /* Tailwind의 text-gray-200 */
+    color: #000; /* Tailwind의 text-gray-200 */
     font-size: 8rem;
     width: 4rem;
     height: 4rem;
@@ -221,12 +236,131 @@ body {
   .typography::before {
     content: "“";
     left: -3rem;
-    top: -3.5rem;
+    top: -2rem;
   }
 
   .typography::after {
     content: "”";
-    right: -5rem;
+    right: -3rem;
     bottom: 0.5rem;
   }
+}
+/* 📌 네이버 캘린더 스타일 */
+.custom-calendar {
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  font-family: "Pretendard", sans-serif;
+}
+
+/* 📌 기본 캘린더 스타일 */
+.react-calendar {
+  width: 100%;
+  max-width: 100%;
+  background: white;
+  border: none;
+  font-size: 16px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 10px;
+}
+
+/* 📌 네비게이션 (월 이동 버튼) */
+.react-calendar__navigation {
+  justify-content: space-between;
+  gap: 4px;
+  align-items: center;
+  margin-bottom: 12px !important;
+}
+
+.react-calendar__navigation button {
+  background: none;
+  border: 1px solid #d1d5db !important;
+  font-size: 18px;
+  color: #333;
+  padding: 6px;
+  border-radius: 8px;
+  transition: all 0.2s;
+  min-width: 32px !important;
+  margin: 0;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+abbr:where([title]) {
+  text-decoration: none;
+}
+
+.react-calendar__month-view__weekdays {
+  margin-bottom: 12px;
+}
+
+.react-calendar__navigation button:nth-child(3) {
+  border: none !important;
+}
+
+.react-calendar__navigation button:disabled {
+  background-color: transparent !important;
+}
+
+.react-calendar__navigation button:hover {
+  background: rgba(99, 102, 241, 0.1);
+}
+
+/* 📌 요일 헤더 */
+.react-calendar__month-view__weekdays {
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 14px;
+  color: #666;
+}
+
+/* 📌 날짜 타일 */
+.react-calendar__tile {
+  padding: 0 !important;
+  text-align: center;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s;
+  width: 32px;
+  height: 32px;
+}
+
+/* 📌 오늘 날짜 */
+.react-calendar__tile--now {
+  background: rgba(99, 102, 241, 0.15) !important;
+  color: #6366f1;
+  font-weight: bold;
+  border-radius: 8px;
+}
+
+/* 📌 선택한 날짜 */
+.react-calendar__tile--active {
+  background: #6366f1 !important;
+  color: white !important;
+  font-weight: bold;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+/* 📌 Hover 효과 */
+.react-calendar__tile:hover {
+  background: rgba(99, 102, 241, 0.2) !important;
+}
+
+/* 📌 비활성화된 날짜 */
+.react-calendar__tile:disabled {
+  color: #bbb !important;
+  background: #f3f4f6;
+  cursor: not-allowed;
+}
+
+/* 📌 요일 간격 조정 */
+.react-calendar__month-view__days {
+  display: grid !important;
+  grid-template-columns: repeat(7, 1fr);
+  justify-items: center;
+  gap: 16px;
 }

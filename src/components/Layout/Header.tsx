@@ -9,6 +9,7 @@ import { createClient } from "@/utils/supabase/client";
 import { AuthSession } from "@supabase/supabase-js";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSessionStore } from "@/lib/zustand/useSessionStore";
+import { usePathname } from "next/navigation";
 
 const navLinks = [
   {
@@ -35,13 +36,13 @@ const navLinks = [
     submenu: [
       { name: "메타버스 공간", href: "/community/metaverse" },
       { name: "온라인 추모 갤러리", href: "/community/memorial-gallery" },
-      { name: "커뮤니티 포럼", href: "/community/forum" },
+      { name: "공지사항", href: "/community/notice" },
     ],
   },
   {
     href: "/shop",
-    name: "용품샵",
-    submenu: [{ name: "애견샵", href: "/shop/pet-store" }],
+    name: "애견샵",
+    submenu: [{ name: "용품샵", href: "/shop/pet-store" }],
   },
 ];
 
@@ -50,6 +51,8 @@ export default function Header() {
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [menuDropdownOpen, setMenuDropdownOpen] = useState(false);
   const profileDropdownRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
 
   const { session } = useSessionStore();
 
@@ -79,10 +82,29 @@ export default function Header() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [profileDropdownOpen]);
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setTimeout(() => {
+          setIsOpen(false);
+        }, 100); // 🔹 클릭 후 100ms 지연
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
 
   return (
     <header className=" w-full bg-white shadow-md fixed top-0 z-50">
-      <div className="container mx-auto flex justify-between md:justify-start gap-0 md:gap-14 lg:gap-40 xl:justify-between items-center py-4 px-6 z-20">
+      <div className="container mx-auto flex justify-between gap-0 md:gap-10 lg:gap-40 xl:justify-between items-center py-4 px-6 z-20">
         {/* Logo */}
         <Link href="/" className="text-2xl font-bold text-gray-800">
           <Image src="/animal.png" alt="로고" width={36} height={36} />
@@ -90,21 +112,34 @@ export default function Header() {
 
         {/* Desktop Menu */}
         <nav className="hidden md:flex gap-6 lg:gap-8">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="dropdown-menu"
-              onMouseEnter={() => setMenuDropdownOpen(true)}
-            >
-              {link.name}
-            </Link>
-          ))}
+          {navLinks.map((link) =>
+            pathname.startsWith(link.href) ? (
+              // ✅ 활성화된 메뉴 (보라색)
+              <Link
+                key={link.href}
+                href={link.href}
+                className="dropdown-menu-active"
+                onMouseEnter={() => setMenuDropdownOpen(true)}
+              >
+                {link.name}
+              </Link>
+            ) : (
+              // ✅ 비활성화된 메뉴 (기본 스타일)
+              <Link
+                key={link.href}
+                href={link.href}
+                className="dropdown-menu"
+                onMouseEnter={() => setMenuDropdownOpen(true)}
+              >
+                {link.name}
+              </Link>
+            )
+          )}
         </nav>
 
         {/* Right Side - 로그인 상태별 UI 변경 */}
-        <div className=" flex items-center space-x-4">
-          <button className="header-btn-text md:hidden">
+        <div className=" flex items-center space-x-2">
+          <button className="header-btn-text">
             <Search size={20} />
           </button>
 
@@ -199,8 +234,11 @@ export default function Header() {
           )}
 
           <button
-            className="md:hidden p-2 text-gray-700"
-            onClick={() => setIsOpen(!isOpen)}
+            className="flex md:hidden p-2 text-gray-700"
+            onClick={(event) => {
+              event.stopPropagation();
+              setIsOpen((prev) => !prev);
+            }}
           >
             <Menu size={24} />
           </button>
@@ -243,20 +281,38 @@ export default function Header() {
       </AnimatePresence>
 
       {/* Mobile Menu */}
-      {isOpen && (
-        <div className="md:hidden bg-white shadow-lg p-4 absolute top-16 left-0 w-full">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="block py-2 text-gray-700"
-            >
-              {link.name}
-            </Link>
-          ))}
-          <Button className="w-full mt-4">Sign In</Button>
-        </div>
-      )}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            ref={menuRef}
+            className="md:hidden bg-white shadow-lg p-4 absolute top-16 left-0 w-full"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+          >
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="block py-2 text-gray-700 hover:text-violet-600 transition"
+                onClick={() => setIsOpen(false)}
+              >
+                {link.name}
+              </Link>
+            ))}
+            {session ? (
+              <Button className="w-full mt-4" onClick={handleSignOut}>
+                LogOut
+              </Button>
+            ) : (
+              <Button className="w-full mt-4">
+                <Link href="/auth/signin">LogIn</Link>
+              </Button>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }

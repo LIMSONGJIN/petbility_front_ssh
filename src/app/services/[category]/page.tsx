@@ -145,7 +145,7 @@ export default function ServiceCategoryPage() {
         ))}
       </div>
 
-      <div className="flex justify-center">
+      <div className="flex justify-center font-nanumbrush">
         {/* 타이포그래픽 문구 */}
         <p className="typography">
           여러분들의 반려동물에게 최고의 장례를 선사하세요. <br />
