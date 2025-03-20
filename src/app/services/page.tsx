@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function ServicesHome() {
   return (
-    <section className="container mx-auto py-12 px-6 h-screen">
+    <section className="container mx-auto py-12 px-6">
       <h1 className="text-4xl font-bold text-gray-800 text-center mb-6">
         펫빌리티 서비스 소개
       </h1>

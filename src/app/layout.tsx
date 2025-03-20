@@ -21,7 +21,9 @@ export default function RootLayout({
       <body>
         <SessionProvider>
           <Header />
-          <div className="pt-[68px] bg-violet-100">{children}</div>
+          <div className="pt-[68px] bg-violet-100 h-full min-h-screen">
+            {children}
+          </div>
           <Footer />
           <ToastContainer />
         </SessionProvider>
