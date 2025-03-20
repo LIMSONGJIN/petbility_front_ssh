@@ -8,7 +8,7 @@ import { revalidatePath } from "next/cache";
 const signInWith = (provider: Provider) => async () => {
   const supabase = await createClientForServer();
 
-  const auth_callback_url = `${process.env.SITE_URL}/auth/callback`;
+  const auth_callback_url = `http://pet.metashopping.kr/auth/callback`;
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
