@@ -51,7 +51,7 @@ export default function BestProductsSection() {
                 alt={product.name}
                 width={400}
                 height={300}
-                className="w-full h-48 object-cover rounded-md"
+                className="w-full h-48 rounded-md overflow-hidden"
               />
               <h3 className="text-lg font-semibold text-gray-800 mt-4">
                 {product.name}
@@ -61,20 +61,17 @@ export default function BestProductsSection() {
               </p>
 
               <div className="flex items-center justify-between mt-4">
-                {product.discount_price > 0 ? (
-                  <div className="flex flex-col">
-                    <span className="text-sm text-gray-400 line-through">
-                      {product.original_price.toLocaleString()}원
-                    </span>
+                <span className="text-lg font-bold text-violet-600">
+                  {product.discount_price > 0 ? (
                     <span className="text-lg font-bold text-violet-600">
                       {product.discount_price.toLocaleString()}원
                     </span>
-                  </div>
-                ) : (
-                  <span className="text-lg font-bold text-violet-600">
-                    {product.original_price.toLocaleString()}원
-                  </span>
-                )}
+                  ) : (
+                    <span className="text-lg font-bold text-violet-600">
+                      {product.original_price.toLocaleString()}원
+                    </span>
+                  )}
+                </span>
                 <span className="text-sm text-gray-500">
                   재고: {product.stock}개
                 </span>

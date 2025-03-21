@@ -364,3 +364,7 @@ abbr:where([title]) {
   justify-items: center;
   gap: 16px;
 }
+
+.slick-dots {
+  bottom: -40px !important;
+}
