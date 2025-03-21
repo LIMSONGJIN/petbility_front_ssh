@@ -41,11 +41,8 @@ const navLinks = [
   },
   {
     href: "/shop",
-    name: "애견샵",
-    submenu: [
-      { name: "용품샵", href: "/shop/pet-store" },
-      { name: "식품샵", href: "/shop/food-store" },
-    ],
+    name: "식·용품샵",
+    submenu: [{ name: "식·용품샵", href: "/shop" }],
   },
 ];
 
