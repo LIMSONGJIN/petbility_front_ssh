@@ -241,7 +241,7 @@ body {
 
   .typography::after {
     content: "”";
-    right: -3rem;
+    right: -1rem;
     bottom: 0.5rem;
   }
 }

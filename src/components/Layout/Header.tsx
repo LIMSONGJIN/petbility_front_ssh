@@ -26,8 +26,8 @@ const navLinks = [
     href: "/reservations",
     name: "서비스 예약",
     submenu: [
-      { name: "장례 서비스 예약", href: "/reservations/funeral" },
-      { name: "미용 · 목욕 서비스 예약", href: "/reservations/grooming" },
+      { name: "장례 서비스 예약", href: "/reservations" },
+      { name: "미용 · 목욕 서비스 예약", href: "/reservations" },
     ],
   },
   {
@@ -139,7 +139,7 @@ export default function Header() {
 
         {/* Right Side - 로그인 상태별 UI 변경 */}
         <div className=" flex items-center space-x-2">
-          <button className="header-btn-text">
+          <button className="block md:hidden header-btn-text">
             <Search size={20} />
           </button>
 

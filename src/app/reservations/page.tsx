@@ -63,7 +63,7 @@ export default function ReservationList() {
   }, [isDropdownOpen]);
 
   return (
-    <section className="container mx-auto px-6 py-8 h-screen">
+    <section className="container mx-auto px-6 py-8 min-h-screen h-full">
       <h2 className="text-3xl font-bold text-gray-800 text-center mb-6">
         모든 서비스 예약
       </h2>

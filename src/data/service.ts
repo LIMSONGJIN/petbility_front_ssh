@@ -119,7 +119,7 @@ const bestProducts = [
     stock: 20,
     like: 150,
     category: "사료",
-    image_url: "/default-avatar.svg",
+    image_url: "/products/product_1.png",
     created_at: "2024-03-14T10:00:00Z",
   },
   {
@@ -133,7 +133,7 @@ const bestProducts = [
     stock: 15,
     like: 120,
     category: "장난감",
-    image_url: "/default-avatar.svg",
+    image_url: "/products/product_2.png",
     created_at: "2024-03-14T11:00:00Z",
   },
   {
@@ -146,7 +146,7 @@ const bestProducts = [
     stock: 10,
     like: 95,
     category: "용품",
-    image_url: "/default-avatar.svg",
+    image_url: "/products/product_3.png",
     created_at: "2024-03-14T12:00:00Z",
   },
   {
@@ -159,7 +159,7 @@ const bestProducts = [
     stock: 5,
     like: 80,
     category: "용품",
-    image_url: "/default-avatar.svg",
+    image_url: "/products/product_4.png",
     created_at: "2024-03-14T13:00:00Z",
   },
   {
@@ -172,7 +172,7 @@ const bestProducts = [
     stock: 50,
     like: 65,
     category: "간식",
-    image_url: "/default-avatar.svg",
+    image_url: "/products/product_5.png",
     created_at: "2024-03-14T14:00:00Z",
   },
   {
@@ -185,7 +185,7 @@ const bestProducts = [
     stock: 8,
     like: 110,
     category: "용품",
-    image_url: "/default-avatar.svg",
+    image_url: "/products/product_6.png",
     created_at: "2024-03-14T15:00:00Z",
   },
 ];
