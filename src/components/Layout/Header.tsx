@@ -60,6 +60,7 @@ export default function Header() {
   const handleSignOut = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
+    localStorage.removeItem("token");
   };
   // 프로필 드롭다운 외부 클릭 감지
   useEffect(() => {

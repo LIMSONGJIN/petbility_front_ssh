@@ -39,8 +39,6 @@ const signupWithEmailPassword = async (prev: any, formData: FormData) => {
     );
   }
 
-  const role = formData.get("role") as string;
-
   const { data: authData, error: authError } = await supabase.auth.signUp({
     email: formData.get("email") as string,
     password: formData.get("password") as string,
@@ -50,7 +48,7 @@ const signupWithEmailPassword = async (prev: any, formData: FormData) => {
         phone: formData.get("phone") as string,
         profileImage: profileImageUrl,
         address: formData.get("address") as string,
-        role: role,
+        role: formData.get("role") as string,
       },
     },
   });
@@ -58,30 +56,43 @@ const signupWithEmailPassword = async (prev: any, formData: FormData) => {
   console.log(authData);
 
   if (authError) {
-    console.log(authError);
-    revalidatePath("/auth/signup");
+    console.log("Supabase 에러:", authError.message);
     return { message: authError.message };
   }
-  const userId = authData.user?.id;
-  if (userId) {
-    const { error: dbError } = await supabase.from("user").insert([
-      {
-        id: userId,
-        email: formData.get("email") as string,
-        name: formData.get("name") as string,
-        phone: formData.get("phone") as string,
-        profile_image: profileImageUrl,
-        address: formData.get("address") as string,
-        role: role,
-      },
-    ]);
-
-    if (dbError) {
-      console.log("DB 저장 실패:", dbError.message);
-    }
+  const user = authData.user;
+  if (!user) {
+    return { message: "유저 생성에 실패했습니다." };
   }
 
-  redirect("/");
+  // ✅ JWT access token 추출
+  const { data: sessionData } = await supabase.auth.getSession();
+  const token = sessionData.session?.access_token;
+
+  // ✅ NestJS 백엔드로 회원 정보 전달
+  const response = await fetch(`${process.env.API_URL}/users/signup`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`, // JWT 인증
+    },
+    body: JSON.stringify({
+      id: user.id,
+      email: user.email,
+      name: formData.get("name"),
+      phone: formData.get("phone"),
+      address: formData.get("address"),
+      profile_image: profileImageUrl,
+      role: formData.get("role"),
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.log("백엔드 저장 실패:", errorText);
+    return { message: "백엔드 사용자 저장에 실패했습니다." };
+  }
+
+  return redirect("/");
 };
 
 const uploadProfileImage = async (file: File) => {
@@ -113,13 +124,12 @@ const signinWithEmailPassword = async (prev: any, formData: FormData) => {
     password: formData.get("password") as string,
   });
 
-  console.log(data);
-
   if (error) {
     console.log(error);
-    revalidatePath("/auth/signin");
     return { message: error.message };
-  } else redirect("/");
+  }
+
+  return { success: true }; // ✅ 리다이렉트 하지 않고 결과만 반환
 };
 
 const sendResetPasswordForEmail = async (prev: any, formData: FormData) => {

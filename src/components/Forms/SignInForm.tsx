@@ -13,16 +13,37 @@ import { Label } from "../ui/label";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Image from "next/image";
+import { useSessionStore } from "@/lib/zustand/useSessionStore";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/utils/supabase/client";
 
 const SignInForm = () => {
-  const [error, formAction, isPending] = useActionState(
-    signinWithEmailPassword,
-    null
-  );
-
+  const router = useRouter();
+  const { fetchSession } = useSessionStore();
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [email, setEmail] = useState("");
+
+  const [error, formAction, isPending] = useActionState<
+    { message?: string; success?: boolean }, // 반환 타입
+    FormData // formData 타입
+  >(async (_prev, formData) => {
+    const result = await signinWithEmailPassword(null, formData);
+
+    if (result?.success) {
+      const supabase = createClient();
+      const { data } = await supabase.auth.getSession();
+
+      if (data?.session?.access_token) {
+        localStorage.setItem("token", data.session.access_token); // ✅ 저장
+      }
+
+      router.push("/auth/callback/client");
+      await fetchSession();
+    }
+
+    return result;
+  }, {});
 
   useEffect(() => {
     const savedEmail = localStorage.getItem("rememberedEmail");
