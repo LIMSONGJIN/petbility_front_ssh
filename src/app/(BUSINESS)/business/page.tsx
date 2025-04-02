@@ -10,6 +10,7 @@ import {
   Star,
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function BusinessDashboard() {
   return (
@@ -47,6 +48,7 @@ export default function BusinessDashboard() {
             </div>
             <p className="text-2xl font-bold text-[#122358]">3건</p>
             <p className="text-sm text-gray-500">대기 1 · 확정 2</p>
+            <Link href="/business/services">Service</Link>
           </CardContent>
         </Card>
 

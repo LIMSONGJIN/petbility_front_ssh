@@ -49,6 +49,8 @@ const signupWithEmailPassword = async (prev: any, formData: FormData) => {
         profileImage: profileImageUrl,
         address: formData.get("address") as string,
         role: formData.get("role") as string,
+        latitude: 0,
+        longitude: 0,
       },
     },
   });
@@ -83,6 +85,8 @@ const signupWithEmailPassword = async (prev: any, formData: FormData) => {
       address: formData.get("address"),
       profile_image: profileImageUrl,
       role: formData.get("role"),
+      latitude: 0,
+      longitude: 0,
     }),
   });
 

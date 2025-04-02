@@ -27,6 +27,8 @@ const SignUpForm = ({
     baseAddress: "",
     detailAddress: "",
     role: "USER",
+    latitude: 0,
+    longitude: 0,
   });
 
   const [isAddressOpen, setIsAddressOpen] = useState(false);
@@ -56,6 +58,8 @@ const SignUpForm = ({
       baseAddress: `${data.zonecode} ${data.address}`,
       detailAddress: "",
       address: `${data.zonecode} ${data.address}`,
+      latitude: 0,
+      longitude: 0,
     });
     setIsAddressOpen(false);
   };
