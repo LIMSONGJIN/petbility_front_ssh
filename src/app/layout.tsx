@@ -6,6 +6,9 @@ import InitUserSync from "@/utils/auth/InitUserSync";
 import { QueryProvider } from "@/lib/react-query/QueryProvider";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:7777"
+  ),
   title: "펫빌리티 | 반려동물 장례 · 미용 · 케어 & 용품샵",
   description:
     "이동식 반려동물 장례, 미용, 목욕 서비스부터 맞춤형 차량 제작·렌트, 그리고 반려동물 용품까지! 반려동물의 마지막 여정과 삶을 함께하는 펫빌리티.",

@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { Reservation, PaginationParams } from "@/types/business";
 import { reservationApi } from "@/api/business";
 import { ReservationList } from "@/components/Business/Reservation/ReservationList";
 import BusinessSchedule from "@/components/Business/Reservation/BusinessSchedule";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
+import { useParams } from "next/navigation";
 
 interface Schedule {
   startTime: string;
@@ -20,8 +20,7 @@ interface Schedule {
 }
 
 export default function ReservationsPage() {
-  const searchParams = useSearchParams();
-  const customerId = searchParams.get("customer_id");
+  const { id } = useParams();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"list" | "schedule">("list");
@@ -85,7 +84,7 @@ export default function ReservationsPage() {
   const filteredReservations = reservations.filter((reservation) => {
     const statusMatch =
       filterStatus === "all" || reservation.status === filterStatus;
-    const customerMatch = !customerId || reservation.customer_id === customerId;
+    const customerMatch = !id || reservation.customer_id === id;
     const matchesSearch =
       searchQuery === "" ||
       reservation.customer_name
@@ -142,7 +141,7 @@ export default function ReservationsPage() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">
-          {customerId ? "고객 예약 내역" : "예약 관리"}
+          {id ? "고객 예약 내역" : "예약 관리"}
         </h1>
         <div className="flex gap-2 text-violet-500">
           <Button
