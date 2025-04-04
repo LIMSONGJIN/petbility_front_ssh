@@ -41,7 +41,7 @@ export default function HeroSection() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, delay: 0.5 }}
         >
-          <Link href="/reservations">
+          <Link href="/service">
             <button className="px-6 py-3 bg-violet-600 text-white text-lg font-semibold rounded-lg shadow-lg hover:bg-violet-700 transition">
               서비스 예약하기
             </button>

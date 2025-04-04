@@ -62,7 +62,11 @@ export default function MemorialSection() {
             key={index}
             className="bg-white shadow-lg rounded-lg p-8 flex flex-col items-center hover:shadow-xl"
             variants={itemVariants}
-            whileHover={{ scale: 1.03, y: -5 }} // ✅ 더 부드러운 호버 효과
+            whileHover={{
+              scale: 1.03,
+              y: -5,
+              transition: { duration: 0.3, ease: "easeIn" },
+            }} // ✅ 더 부드러운 호버 효과
           >
             {item.icon}
             <h3 className="text-lg font-semibold">{item.title}</h3>

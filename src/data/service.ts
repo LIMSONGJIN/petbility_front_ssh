@@ -111,10 +111,8 @@ const bestProducts = [
     product_id: "1",
     name: "프리미엄 강아지 사료",
     description: "강아지의 건강을 위한 최고급 사료",
-
     original_price: 39000,
     discount_price: 35000,
-
     delivery_fee: 3000,
     stock: 20,
     like: 150,
@@ -128,7 +126,6 @@ const bestProducts = [
     description: "고양이가 좋아하는 다양한 장난감 세트",
     original_price: 20000,
     discount_price: 18000,
-
     delivery_fee: 3000,
     stock: 15,
     like: 120,
@@ -322,3 +319,72 @@ export const reservations = reservationsList;
 export const times = availableTimes;
 export const petsList = pets;
 export const reviewsList = reviews;
+
+// 예약 관련 목업 데이터
+export const mockReservationData = {
+  // 사용자 주소 정보
+  userAddress: {
+    address: "서울특별시 강남구 테헤란로 123",
+    latitude: 37.4979,
+    longitude: 127.0276,
+  },
+
+  // 가능한 시간대 (오전/오후)
+  availableTimeSlots: {
+    morning: ["09:00", "10:00", "11:00", "12:00"],
+    afternoon: ["13:00", "14:00", "15:00", "16:00", "17:00", "18:00"],
+  },
+
+  // 서비스 가격 정보
+  servicePrices: {
+    funeral: 200000,
+    cremation: 150000,
+    grooming: 50000,
+    bathing: 30000,
+    custom_vehicles: 100000,
+    other_care: 40000,
+  },
+
+  // 반려동물 목록
+  pets: [
+    {
+      id: "pet1",
+      name: "루루",
+      type: "강아지",
+      breed: "골든 리트리버",
+      age: 3,
+      image: "https://placehold.co/300x300",
+    },
+    {
+      id: "pet2",
+      name: "나비",
+      type: "고양이",
+      breed: "페르시안",
+      age: 2,
+      image: "https://placehold.co/300x300",
+    },
+  ],
+
+  // 예약 단계 정보
+  reservationSteps: [
+    { id: 1, title: "주소 확인", description: "서비스 제공 지역 확인" },
+    {
+      id: 2,
+      title: "날짜 및 시간 선택",
+      description: "예약 가능한 날짜와 시간 선택",
+    },
+    {
+      id: 3,
+      title: "반려동물 선택",
+      description: "서비스를 받을 반려동물 선택",
+    },
+    { id: 4, title: "메모 및 결제", description: "특이사항 입력 및 결제" },
+    {
+      id: 5,
+      title: "예약 완료",
+      description: "예약이 성공적으로 완료되었습니다",
+    },
+  ],
+};
+
+export { serviceList, memorialPosts, bestProducts };

@@ -17,28 +17,6 @@ body {
 
 @layer base {
   :root {
-    /* 🌟 기본 컬러 (밝은 테마) */
-    --background: 39 50% 96%; /* 크림 베이지 */
-    --foreground: 220 15% 20%; /* 차콜 블루 */
-
-    --card: 39 45% 92%; /* 밝은 베이지 */
-    --card-foreground: 220 15% 20%;
-
-    --primary: 220 15% 20%; /* 차콜 블루 */
-    --primary-foreground: 39 50% 96%;
-
-    --secondary: 30 20% 85%; /* 웜 그레이 */
-    --secondary-foreground: 220 15% 20%;
-
-    --muted: 30 15% 80%;
-    --muted-foreground: 220 10% 35%;
-
-    --accent: 0 75% 65%; /* 코랄 오렌지 */
-    --accent-foreground: 39 50% 96%;
-
-    --destructive: 0 65% 55%;
-    --destructive-foreground: 39 50% 96%;
-
     --border: 30 20% 80%;
     --input: 30 20% 80%;
     --ring: 220 15% 20%;
@@ -47,28 +25,6 @@ body {
   }
 
   .dark {
-    /* 🌙 다크 모드 컬러 */
-    --background: 220 15% 10%;
-    --foreground: 39 50% 96%;
-
-    --card: 220 15% 15%;
-    --card-foreground: 39 50% 96%;
-
-    --primary: 39 50% 96%;
-    --primary-foreground: 220 15% 10%;
-
-    --secondary: 220 15% 25%;
-    --secondary-foreground: 39 50% 96%;
-
-    --muted: 220 10% 30%;
-    --muted-foreground: 39 50% 90%;
-
-    --accent: 0 75% 55%;
-    --accent-foreground: 39 50% 96%;
-
-    --destructive: 0 65% 45%;
-    --destructive-foreground: 39 50% 96%;
-
     --border: 220 15% 25%;
     --input: 220 15% 25%;
     --ring: 39 50% 96%;
@@ -267,6 +223,7 @@ body {
 
 /* 📌 네비게이션 (월 이동 버튼) */
 .react-calendar__navigation {
+  display: flex;
   justify-content: space-between;
   gap: 4px;
   align-items: center;
@@ -279,6 +236,7 @@ body {
   font-size: 18px;
   color: #333;
   padding: 6px;
+  padding-bottom: 12px;
   border-radius: 8px;
   transition: all 0.2s;
   min-width: 32px !important;
@@ -311,6 +269,7 @@ abbr:where([title]) {
 
 /* 📌 요일 헤더 */
 .react-calendar__month-view__weekdays {
+  text-align: center;
   text-transform: uppercase;
   font-weight: 600;
   font-size: 14px;

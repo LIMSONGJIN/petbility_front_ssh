@@ -6,29 +6,32 @@ import { Menu, Search, Bell, ShoppingCart, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { createClient } from "@/utils/supabase/client";
-import { AuthSession } from "@supabase/supabase-js";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSessionStore } from "@/lib/zustand/useSessionStore";
 import { usePathname } from "next/navigation";
 
 const navLinks = [
   {
-    href: "/services",
-    name: "소개",
+    href: "/info",
+    name: "펫빌리티",
+    submenu: [{ name: "펫빌리티 소개", href: "/info" }],
+  },
+  {
+    href: "/service",
+    name: "서비스",
     submenu: [
-      { name: "장례 서비스", href: "/services/funeral" },
-      { name: "미용 · 목욕 서비스", href: "/services/grooming" },
-      { name: "맞춤형 차량 제작", href: "/services/custom-vehicles" },
-      { name: "기타 반려동물 케어", href: "/services/other-care" },
+      { name: "화장 서비스", href: "/service/cremation" },
+      { name: "장례 서비스", href: "/service/funeral" },
+      { name: "미용 서비스", href: "/service/grooming" },
+      { name: "목욕 서비스", href: "/service/bathing" },
+      { name: "맞춤형 차량 제작", href: "/service/custom-vehicles" },
+      { name: "기타 반려동물 케어", href: "/service/other-care" },
     ],
   },
   {
-    href: "/reservations",
-    name: "서비스 예약",
-    submenu: [
-      { name: "장례 서비스 예약", href: "/reservations" },
-      { name: "미용 · 목욕 서비스 예약", href: "/reservations" },
-    ],
+    href: "#",
+    name: "온라인 문의",
+    submenu: [{ name: "온라인 문의", href: "#" }],
   },
   {
     href: "/community",
@@ -40,9 +43,9 @@ const navLinks = [
     ],
   },
   {
-    href: "/shop",
+    href: "/shopping",
     name: "식·용품샵",
-    submenu: [{ name: "식·용품샵", href: "/shop" }],
+    submenu: [{ name: "식·용품샵", href: "/shopping" }],
   },
 ];
 
@@ -62,6 +65,7 @@ export default function Header() {
     await supabase.auth.signOut();
     localStorage.removeItem("token");
   };
+
   // 프로필 드롭다운 외부 클릭 감지
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -105,7 +109,7 @@ export default function Header() {
 
   return (
     <header className=" w-full bg-white shadow-md fixed top-0 z-50">
-      <div className="container mx-auto flex justify-between gap-0 md:gap-10 lg:gap-40 xl:justify-between items-center py-4 px-6 z-20">
+      <div className="container mx-auto flex justify-between gap-0 md:gap-4 lg:gap-32 xl:justify-between items-center py-4 px-6 z-20">
         {/* Logo */}
         <Link href="/" className="text-2xl font-bold text-gray-800">
           <Image src="/animal.png" alt="로고" width={36} height={36} />
@@ -256,14 +260,14 @@ export default function Header() {
             className="absolute left-0 w-full bg-white bg-opacity-50 backdrop-blur-md shadow-lg border-gray-200"
             onMouseLeave={() => setMenuDropdownOpen(false)}
           >
-            <div className="container mx-auto grid grid-cols-4 gap-8 py-4 px-6">
+            <div className="container mx-auto flex justify-around gap-8 py-4 px-6">
               {navLinks.map((link) => (
                 <div key={link.name}>
                   <h3 className="text-gray-800 font-semibold mb-2">
                     {link.name}
                   </h3>
                   <ul>
-                    {link.submenu.map((item, index) => (
+                    {link.submenu?.map((item, index) => (
                       <li key={index}>
                         <Link
                           href={item.href}

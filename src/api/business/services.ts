@@ -1,25 +1,26 @@
-import api from "../axios";
+import { Service } from "@/types/service";
 
-// ✅ 서비스 목록 조회
-export const fetchBusinessServices = async () => {
-  const res = await api.get("/business/services");
-  return res.data;
-};
+export async function fetchBusinessServices(): Promise<Service[]> {
+  const response = await fetch("/api/business/services");
+  if (!response.ok) {
+    throw new Error("서비스 목록 조회 실패");
+  }
+  return response.json();
+}
 
-// ✅ 서비스 등록
-export const createBusinessService = async (payload: any) => {
-  const res = await api.post("/business/services", payload);
-  return res.data;
-};
+export async function updateServiceStatus(
+  serviceId: string,
+  isActive: boolean
+): Promise<void> {
+  const response = await fetch(`/api/business/services/${serviceId}/status`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ is_active: isActive }),
+  });
 
-// ✅ 서비스 수정
-export const updateBusinessService = async (id: string, payload: any) => {
-  const res = await api.patch(`/business/services/${id}`, payload);
-  return res.data;
-};
-
-// ✅ 서비스 삭제 (is_deleted 처리)
-export const deleteBusinessService = async (id: string) => {
-  await api.delete(`/business/services/${id}`);
-  return true;
-};
+  if (!response.ok) {
+    throw new Error("서비스 상태 변경 실패");
+  }
+}

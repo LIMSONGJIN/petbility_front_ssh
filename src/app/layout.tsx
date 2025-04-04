@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ToastContainer } from "react-toastify";
-import Script from "next/script";
-import Header from "@/components/Layout/Header";
-import Footer from "@/components/Layout/Footer";
 import SessionProvider from "@/lib/zustand/SessionProvider";
 import InitUserSync from "@/utils/auth/InitUserSync";
+import { QueryProvider } from "@/lib/react-query/QueryProvider";
 
 export const metadata: Metadata = {
   title: "펫빌리티 | 반려동물 장례 · 미용 · 케어 & 용품샵",
@@ -56,13 +54,13 @@ export default function RootLayout({
     <html lang="ko">
       <body>
         <SessionProvider>
-          <InitUserSync />
-          <Header />
-          <div className="pt-[68px] bg-violet-100 h-full min-h-screen">
-            {children}
-          </div>
-          <Footer />
-          <ToastContainer />
+          <QueryProvider>
+            <InitUserSync />
+
+            <div>{children}</div>
+
+            <ToastContainer />
+          </QueryProvider>
         </SessionProvider>
       </body>
     </html>

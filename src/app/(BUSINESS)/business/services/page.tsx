@@ -1,65 +1,87 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchBusinessServices } from "@/api/business/services";
-import { Service } from "@/types/service";
-import { Card, CardContent } from "@/components/ui/card";
+import { Service } from "@/types/business";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { SERVICE_CATEGORIES } from "@/constants/service";
+import { ServiceCard } from "@/components/Business/Service/ServiceCard";
+import { serviceApi } from "@/api/business";
+import { toast } from "react-toastify";
 
 export default function BusinessServiceListPage() {
   const [services, setServices] = useState<Service[]>([]);
-  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
+
+  const loadServices = async () => {
+    try {
+      const response = await serviceApi.getServices();
+      setServices(response.data);
+    } catch (error) {
+      console.error("서비스 목록 조회 실패:", error);
+      toast.error("서비스 목록을 불러오는데 실패했습니다.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await fetchBusinessServices();
-        setServices(data);
-      } catch (err) {
-        console.error("서비스 조회 실패:", err);
-      }
-    };
-    fetchData();
+    loadServices();
   }, []);
+
+  const handleServiceToggle = async (
+    serviceId: string,
+    currentStatus: Service["status"]
+  ) => {
+    try {
+      const newStatus = currentStatus === "active" ? "inactive" : "active";
+      await serviceApi.updateServiceStatus(serviceId, newStatus);
+
+      setServices((prevServices) =>
+        prevServices.map((service) =>
+          service.service_id === serviceId
+            ? { ...service, status: newStatus }
+            : service
+        )
+      );
+
+      toast.success(
+        newStatus === "active"
+          ? "서비스 운영이 시작되었습니다."
+          : "서비스 운영이 중지되었습니다."
+      );
+    } catch (error) {
+      console.error("서비스 상태 변경 실패:", error);
+      toast.error("서비스 상태를 변경하는데 실패했습니다.");
+    }
+  };
+
+  if (isLoading) {
+    return <div className="max-w-6xl mx-auto p-6">로딩 중...</div>;
+  }
 
   return (
     <div className="max-w-6xl mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">내 서비스 목록</h1>
-        <Button onClick={() => router.push("/business/services/new")}>
-          새 서비스 등록
-        </Button>
+        <h1 className="text-2xl font-bold">운영 서비스 관리</h1>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {services.length === 0 ? (
-          <p className="text-gray-500">등록된 서비스가 없습니다.</p>
-        ) : (
-          services.map((service) => (
-            <Card
-              key={service.service_id}
-              className="hover:shadow-lg cursor-pointer"
-              onClick={() =>
-                router.push(`/business/services/${service.service_id}`)
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {SERVICE_CATEGORIES.map((category) => {
+          const service = services.find((s) => s.name === category.name);
+          const isActive = service?.status === "active";
+
+          return (
+            <ServiceCard
+              key={category.id}
+              category={category}
+              isActive={isActive}
+              onToggle={() =>
+                service &&
+                handleServiceToggle(service.service_id, service.status)
               }
-            >
-              <CardContent className="p-4">
-                <h2 className="text-lg font-semibold mb-1">{service.name}</h2>
-                <p className="text-sm text-gray-600 mb-2">
-                  {service.description}
-                </p>
-                <p className="text-sm">
-                  가격: {Number(service.price).toLocaleString()}원
-                </p>
-                <p className="text-sm">카테고리: {service.category}</p>
-                <p className="text-sm">
-                  진열 상태: {service.is_deleted ? "숨김" : "진열 중"}
-                </p>
-              </CardContent>
-            </Card>
-          ))
-        )}
+            />
+          );
+        })}
       </div>
     </div>
   );
