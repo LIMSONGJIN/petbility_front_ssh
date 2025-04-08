@@ -44,7 +44,7 @@ export default function BestProductsSection() {
       {/* Slick 슬라이더 */}
       <Slider {...settings}>
         {bestProducts.map((product) => (
-          <div key={product.product_id} className="px-2">
+          <div key={product.product_id} className="w-full max-w-[280px] p-4">
             <div className="bg-white rounded-lg shadow-lg p-6 flex flex-col justify-between hover:shadow-xl transition">
               <Image
                 src={product.image_url}

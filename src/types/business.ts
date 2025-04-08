@@ -1,3 +1,5 @@
+import { ReservationStatus, ServiceCategory } from "./api";
+
 // 공통 타입
 export interface TimeRange {
   start: string;
@@ -28,6 +30,7 @@ export interface Service {
   name: string;
   description: string;
   price: number;
+  category: ServiceCategory;
   status: "active" | "inactive";
   created_at: string;
   updated_at: string;
@@ -50,19 +53,14 @@ export interface Customer {
 // 예약 관련 타입
 export interface Reservation {
   reservation_id: string;
+  user_id: string;
+  pet_id: string;
   service_id: string;
-  service_name: string;
-  customer_id: string;
-  customer_name: string;
-  customer_phone: string;
-  pet_name: string;
-  pet_type: string;
-  reservation_date: string;
-  start_time: string;
-  end_time: string;
-  status: "pending" | "confirmed" | "completed" | "cancelled";
+  business_id: string;
+  status: ReservationStatus;
+  notes?: string;
   price: number;
-  note?: string;
+  reserved_at: string;
   created_at: string;
   updated_at: string;
 }

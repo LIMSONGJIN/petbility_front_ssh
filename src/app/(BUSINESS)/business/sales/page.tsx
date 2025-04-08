@@ -83,7 +83,45 @@ export default function BusinessSales() {
   if (isLoading || !salesSummary) {
     return (
       <div className="min-h-screen p-6">
-        <div className="max-w-7xl mx-auto">로딩 중...</div>
+        <div className="max-w-7xl mx-auto">
+          <div className="flex justify-between items-center mb-6">
+            <div className="h-8 w-48 bg-gray-200 rounded animate-pulse"></div>
+            <div className="flex gap-2">
+              <div className="h-10 w-20 bg-gray-200 rounded animate-pulse"></div>
+              <div className="h-10 w-20 bg-gray-200 rounded animate-pulse"></div>
+              <div className="h-10 w-20 bg-gray-200 rounded animate-pulse"></div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            {[...Array(4)].map((_, index) => (
+              <div key={index} className="bg-white rounded-lg shadow-sm p-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-5 h-5 bg-gray-200 rounded-full animate-pulse"></div>
+                  <div className="h-5 w-24 bg-gray-200 rounded animate-pulse"></div>
+                </div>
+                <div className="h-8 w-32 bg-gray-200 rounded animate-pulse"></div>
+              </div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="h-6 w-32 bg-gray-200 rounded animate-pulse mb-4"></div>
+              <div className="h-64 w-full bg-gray-200 rounded animate-pulse"></div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="h-6 w-40 bg-gray-200 rounded animate-pulse mb-4"></div>
+              <div className="h-64 w-full bg-gray-200 rounded animate-pulse"></div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-sm p-6 lg:col-span-2">
+              <div className="h-6 w-32 bg-gray-200 rounded animate-pulse mb-4"></div>
+              <div className="h-64 w-full bg-gray-200 rounded animate-pulse"></div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

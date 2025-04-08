@@ -327,3 +327,8 @@ abbr:where([title]) {
 .slick-dots {
   bottom: -40px !important;
 }
+
+.slick-arrow {
+  background-color: #6366f1 !important;
+  border-radius: 100%;
+}

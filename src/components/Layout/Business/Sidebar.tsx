@@ -32,7 +32,7 @@ const menuItems = [
   },
   {
     title: "고객 관리",
-    href: "/business/customers",
+    href: "/business/users",
     icon: <Users className="w-5 h-5" />,
   },
   {

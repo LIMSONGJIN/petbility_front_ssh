@@ -19,9 +19,9 @@ const memorialItems = [
   },
   {
     icon: <MessageSquare size={40} className="text-violet-600 mb-4" />,
-    title: "커뮤니티 포럼",
-    description: "보호자들과 소통하며 위로를 나눌 수 있는 커뮤니티입니다.",
-    href: "/community/forum",
+    title: "공지사항",
+    description: "반려동물 관련 소식과 공지사항을 확인하세요.",
+    href: "/community/notice",
   },
 ];
 

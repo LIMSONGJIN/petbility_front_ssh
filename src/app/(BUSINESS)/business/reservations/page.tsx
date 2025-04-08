@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Reservation, PaginationParams } from "@/types/business";
-import { reservationApi } from "@/api/business";
+import { Reservation } from "@/types/api";
+import { reservationApi } from "@/api/reservation";
 import { ReservationList } from "@/components/Business/Reservation/ReservationList";
 import BusinessSchedule from "@/components/Business/Reservation/BusinessSchedule";
 import { Button } from "@/components/ui/button";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { useParams } from "next/navigation";
 
 interface Schedule {
@@ -42,14 +42,11 @@ export default function ReservationsPage() {
 
   const loadData = async () => {
     try {
-      const params: PaginationParams = {
-        page: 1,
-        limit: 10,
-      };
-      const response = await reservationApi.getReservations(params);
-      setReservations(response.data);
+      const response = await reservationApi.getMyReservations();
+      setReservations(response);
     } catch (error) {
       console.error("데이터를 불러오는데 실패했습니다:", error);
+      toast.error("예약 목록을 불러오는데 실패했습니다.");
     } finally {
       setIsLoading(false);
     }
@@ -66,7 +63,9 @@ export default function ReservationsPage() {
     newStatus: Reservation["status"]
   ) => {
     try {
-      await reservationApi.updateReservationStatus(reservationId, newStatus);
+      await reservationApi.updateReservation(reservationId, {
+        status: newStatus,
+      });
       setReservations((prevReservations) =>
         prevReservations.map((reservation) =>
           reservation.reservation_id === reservationId
@@ -200,11 +199,12 @@ export default function ReservationsPage() {
               예약 취소
             </Button>
           </div>
+
           <ReservationList
             reservations={filteredReservations}
-            onSearchChange={setSearchQuery}
-            onStatusChange={setFilterStatus}
-            onStatusUpdate={handleStatusChange}
+            onStatusChange={handleStatusChange}
+            getStatusColor={getStatusColor}
+            getStatusText={getStatusText}
           />
         </>
       ) : (
