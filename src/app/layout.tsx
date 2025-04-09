@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ToastContainer } from "react-toastify";
 import SessionProvider from "@/lib/zustand/SessionProvider";
-import InitUserSync from "@/utils/auth/InitUserSync";
 import { QueryProvider } from "@/lib/react-query/QueryProvider";
+import AuthProvider from "@/components/Providers/AuthProvider";
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -58,11 +58,10 @@ export default function RootLayout({
       <body>
         <SessionProvider>
           <QueryProvider>
-            <InitUserSync />
-
-            <div>{children}</div>
-
-            <ToastContainer />
+            <AuthProvider>
+              <div>{children}</div>
+              <ToastContainer />
+            </AuthProvider>
           </QueryProvider>
         </SessionProvider>
       </body>

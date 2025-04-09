@@ -4,7 +4,31 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Clock, User, Phone, MapPin } from "lucide-react";
 import { reservationApi } from "@/api/business";
-import { Reservation } from "@/types/business";
+import { Reservation } from "@/types/api";
+
+// API 응답을 API 타입의 Reservation으로 변환하는 함수
+const convertToApiReservation = (reservation: any): Reservation => {
+  return {
+    reservation_id: reservation.reservation_id,
+    customer_id: reservation.customer_id || reservation.user_id,
+    customer_name: reservation.customer_name || "고객",
+    customer_phone: reservation.customer_phone || "연락처 정보 없음",
+    pet_id: reservation.pet_id,
+    pet_name: reservation.pet_name || "반려동물",
+    pet_type: reservation.pet_type || "종류 정보 없음",
+    service_id: reservation.service_id,
+    service_name: reservation.service_name || "서비스",
+    reservation_date:
+      reservation.reservation_date || new Date().toISOString().split("T")[0],
+    start_time: reservation.start_time || "00:00",
+    end_time: reservation.end_time || "00:00",
+    status: reservation.status,
+    price: reservation.price || 0,
+    memo: reservation.memo || reservation.notes || "",
+    created_at: reservation.created_at,
+    updated_at: reservation.updated_at,
+  };
+};
 
 export default function RecentReservations() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
@@ -19,9 +43,13 @@ export default function RecentReservations() {
           sort_by: "date",
           sort_order: "desc",
         });
-        setReservations(response.data);
+        const data = Array.isArray(response.data) ? response.data : [];
+        // API 응답을 API 타입의 Reservation으로 변환
+        const convertedReservations = data.map(convertToApiReservation);
+        setReservations(convertedReservations);
       } catch (error) {
         console.error("Failed to load reservations:", error);
+        setReservations([]); // 에러 시 빈 배열로 초기화
       } finally {
         setIsLoading(false);
       }

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Reservation, ReservationStatus } from "@/types/api";
-import { reservationApi } from "@/api/reservation";
+import { businessReservationApi } from "@/api/business/business";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { motion } from "framer-motion";
@@ -31,7 +31,7 @@ export default function ReservationDetailPage() {
 
   const loadReservation = async (id: string) => {
     try {
-      const data = await reservationApi.getReservation(id);
+      const data = await businessReservationApi.getReservation(id);
       setReservation(data);
     } catch (error) {
       console.error("예약 정보를 불러오는데 실패했습니다:", error);
@@ -45,10 +45,11 @@ export default function ReservationDetailPage() {
     if (!reservation) return;
 
     try {
-      const updatedReservation = await reservationApi.updateReservation(
-        reservation.reservation_id,
-        { status: status as ReservationStatus }
-      );
+      const updatedReservation =
+        await businessReservationApi.updateReservationStatus(
+          reservation.reservation_id,
+          status as ReservationStatus
+        );
       setReservation(updatedReservation);
       toast.success("예약 상태가 업데이트되었습니다.");
     } catch (error) {

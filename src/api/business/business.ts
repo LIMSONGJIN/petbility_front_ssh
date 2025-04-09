@@ -6,18 +6,9 @@ import {
   AvailableTime,
 } from "@/types/api";
 import { dummyReservations } from "@/data/dummy/business";
+import { ManageAvailableTimePayload } from "@/types/reservation";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-
-interface BusinessSchedule {
-  startTime: string;
-  endTime: string;
-  breakTime: {
-    start: string;
-    end: string;
-  };
-  selectedDays: boolean[];
-}
 
 interface AvailableTimeData {
   type: "WEEKLY" | "EXCEPTION";
@@ -104,58 +95,6 @@ export const businessReservationApi = {
     }
   },
 
-  // 예약 생성
-  createReservation: async (
-    reservationData: Omit<
-      Reservation,
-      "reservation_id" | "created_at" | "updated_at"
-    >
-  ): Promise<Reservation> => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("인증 토큰이 없습니다.");
-
-    const response = await fetch(`${API_URL}/business/reservations`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(reservationData),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "예약 생성에 실패했습니다.");
-    }
-
-    return response.json();
-  },
-
-  // 예약 수정
-  updateReservation: async (
-    id: string,
-    updateData: Partial<Reservation>
-  ): Promise<Reservation> => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("인증 토큰이 없습니다.");
-
-    const response = await fetch(`${API_URL}/business/reservations/${id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(updateData),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "예약 정보 수정에 실패했습니다.");
-    }
-
-    return response.json();
-  },
-
   // 예약 상태 변경
   updateReservationStatus: async (
     id: string,
@@ -184,47 +123,33 @@ export const businessReservationApi = {
     return response.json();
   },
 
-  // 비즈니스 스케줄 조회
-  getBusinessSchedule: async (): Promise<BusinessSchedule> => {
+  // 예약 가능 시간 관리
+  manageAvailableTime: async (
+    businessId: string,
+    payload: ManageAvailableTimePayload
+  ): Promise<any> => {
     const token = localStorage.getItem("token");
     if (!token) throw new Error("인증 토큰이 없습니다.");
 
-    const response = await fetch(`${API_URL}/business/schedule`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const endpoint = `${API_URL}/business/reservations/${businessId}/available-time`;
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(
-        errorData.message || "영업 시간 정보를 불러오는데 실패했습니다."
-      );
-    }
-
-    return response.json();
-  },
-
-  // 비즈니스 스케줄 업데이트
-  updateBusinessSchedule: async (schedule: BusinessSchedule): Promise<void> => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("인증 토큰이 없습니다.");
-
-    const response = await fetch(`${API_URL}/business/schedule`, {
-      method: "PUT",
+    const response = await fetch(endpoint, {
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(schedule),
+      body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(
-        errorData.message || "영업 시간을 업데이트하는데 실패했습니다."
+        errorData.message || "예약 가능 시간 관리에 실패했습니다."
       );
     }
+
+    return await response.json();
   },
 
   // 특정 서비스의 예약 가능 시간 조회
@@ -272,36 +197,6 @@ export const businessReservationApi = {
       const errorData = await response.json();
       throw new Error(
         errorData.message || "예약 가능 시간을 불러오는데 실패했습니다."
-      );
-    }
-
-    return response.json();
-  },
-
-  // 예약 가능 시간 관리
-  manageAvailableTime: async (
-    serviceId: string,
-    availableTimeData: AvailableTimeData
-  ): Promise<AvailableTime> => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("인증 토큰이 없습니다.");
-
-    const response = await fetch(
-      `${API_URL}/business/reservations/available-time/${serviceId}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(availableTimeData),
-      }
-    );
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(
-        errorData.message || "예약 가능 시간 관리에 실패했습니다."
       );
     }
 

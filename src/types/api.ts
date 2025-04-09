@@ -50,11 +50,9 @@ export interface User {
   email: string;
   name: string;
   phone: string;
-  address?: string;
-  profile_image?: string;
-  role: "USER" | "BUSINESS";
-  latitude?: number;
-  longitude?: number;
+  profile_image: string;
+  address: string;
+  role: UserRole;
   created_at: string;
   updated_at: string;
 }

@@ -6,10 +6,10 @@ import Image from "next/image";
 
 export default function HeroSection() {
   return (
-    <section className="relative w-full h-[85vh] flex items-center justify-center bg-gradient-to-r from-violet-200 to-purple-300 text-gray-900">
+    <section className="relative w-full h-[95vh] flex items-center justify-center bg-gradient-to-r  text-gray-900">
       <div className="absolute inset-0 z-0">
         <Image
-          src="/hero-bg.jpg" // 실제 이미지 경로 확인
+          src="/hero-bg2.svg" // 실제 이미지 경로 확인
           alt="반려동물과 함께하는 순간"
           fill
           className="opacity-40 object-cover"

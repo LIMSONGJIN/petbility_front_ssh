@@ -1,17 +1,16 @@
 // user API
-export * from "./user";
+export * from "./auth";
 
 // business API
 export * from "./business/business";
-export * from "./business/reservations";
 export * from "./business/sales";
 export * from "./business/services";
 
 // user reservation API
-export * from "./user/reservation";
+export * from "./user/user";
 
 // admin API
-export * from "./admin";
+export * from "./admin/admin";
 
 // notification API
 export * from "./notification";

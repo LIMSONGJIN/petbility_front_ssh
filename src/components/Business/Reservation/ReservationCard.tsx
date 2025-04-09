@@ -1,4 +1,4 @@
-import { Reservation } from "@/types/business";
+import { Reservation } from "@/types/api";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
@@ -71,8 +71,8 @@ export function ReservationCard({
                 반려동물: {reservation.pet_name} ({reservation.pet_type})
               </p>
             </div>
-            {reservation.note && (
-              <p className="text-sm text-gray-600">메모: {reservation.note}</p>
+            {reservation.memo && (
+              <p className="text-sm text-gray-600">메모: {reservation.memo}</p>
             )}
           </div>
           <div className="flex gap-2">

@@ -78,7 +78,7 @@ const signupWithEmailPassword = async (prev: any, formData: FormData) => {
       Authorization: `Bearer ${token}`, // JWT 인증
     },
     body: JSON.stringify({
-      id: user.id,
+      user_id: user.id,
       email: user.email,
       name: formData.get("name"),
       phone: formData.get("phone"),

@@ -45,7 +45,7 @@ export default function BestProductsSection() {
       <Slider {...settings}>
         {bestProducts.map((product) => (
           <div key={product.product_id} className="w-full max-w-[280px] p-4">
-            <div className="bg-white rounded-lg shadow-lg p-6 flex flex-col justify-between hover:shadow-xl transition">
+            <div className="bg-white rounded-lg shadow-lg p-6 flex flex-col justify-between hover:shadow-xl transition max-h-[400px]">
               <Image
                 src={product.image_url}
                 alt={product.name}

@@ -12,7 +12,7 @@ export default function ServiceCategoryPage() {
   const categories = {
     [ServiceCategory.FUNERAL]: {
       service_id: "9b851feb-d232-4117-a52a-5c0c5cc17ff4",
-      name: "장례 서비스",
+      name: "프리미엄 장례 서비스",
       description: "반려동물의 마지막을 존엄하게 보내는 맞춤형 장례 서비스",
       tagline:
         "여러분들의 반려동물에게 최고의 장례를 선사하세요. Petbility와 함께라면, 반려동물과의 마지막 순간이 특별한 시간이 될 것입니다. 지금 바로 Petbility의 프리미엄 장례 서비스를 경험해보세요!",
@@ -21,37 +21,37 @@ export default function ServiceCategoryPage() {
           title: "맞춤형 장례 서비스",
           description:
             "보호자의 요구에 맞춘 맞춤형 장례 진행. 다양한 장례 옵션 제공, 화장, 매장, 수목장 등.",
-          image: "https://placehold.co/300x300",
+          image: "/services/funeral/funeral1.svg",
         },
         {
           title: "전문적인 케어",
           description:
             "숙련된 장례 전문가가 전 과정 진행. 위생적이고 존중받는 환경에서의 시신 관리.",
-          image: "https://placehold.co/300x300",
+          image: "/services/funeral/funeral2.svg",
         },
         {
           title: "추모 용품 및 서비스",
           description:
             "유골함, 추모석, 장례용품 등 다양한 추모 상품 제공. 맞춤 제작 추모 앨범 및 영상 서비스.",
-          image: "https://placehold.co/300x300",
+          image: "/services/funeral/funeral3.svg",
         },
         {
           title: "환경 친화적 옵션",
           description:
             "생분해성 소재를 활용한 친환경 장례용품. 탄소 발자국을 줄이는 eco-friendly 장례 프로세스.",
-          image: "https://placehold.co/300x300",
+          image: "/services/funeral/funeral4.svg",
         },
         {
           title: "편리한 예약 및 진행",
           description:
             "온라인/모바일 앱을 통한 간편 예약 시스템. 장례 진행 상황 실시간 알림 서비스.",
-          image: "https://placehold.co/300x300",
+          image: "/services/funeral/funeral5.svg",
         },
         {
           title: "특별한 추모 이벤트",
           description:
             "계절별 특별 추모식 진행(봄꽃 추모제, 한가위 차례 등). 반려동물을 기리는 추모 콘서트 개최.",
-          image: "https://placehold.co/300x300",
+          image: "/services/funeral/funeral6.svg",
         },
       ],
     },
@@ -66,70 +66,70 @@ export default function ServiceCategoryPage() {
           title: "개별 화장 서비스",
           description:
             "반려동물만을 위한 개별 화장 서비스. 다른 반려동물과 혼합되지 않는 프리미엄 화장 옵션.",
-          image: "https://placehold.co/300x300",
+          image: "/services/cremation/cremation1.svg",
         },
         {
           title: "화장 후 케어",
           description:
             "화장 후 유골 보관 및 추모 서비스. 맞춤형 유골함 및 추모 상품 제공.",
-          image: "https://placehold.co/300x300",
+          image: "/services/cremation/cremation2.svg",
         },
         {
           title: "화장 후 처리 옵션",
           description:
             "유골 분산, 수목장, 추모원 등 다양한 화장 후 처리 옵션 제공.",
-          image: "https://placehold.co/300x300",
+          image: "/services/cremation/cremation3.svg",
         },
         {
           title: "화장 증명서 발급",
           description:
             "화장 진행 후 공식 증명서 발급. 법적 효력이 있는 화장 증명서 제공.",
-          image: "https://placehold.co/300x300",
+          image: "/services/cremation/cremation4.svg",
         },
       ],
     },
     [ServiceCategory.GROOMING]: {
-      name: "그루밍 서비스",
+      name: "미용 서비스",
       service_id: "0a1f07bd-5c19-4f68-8c3e-822449545cd6",
       description: "반려동물의 건강과 스타일을 책임지는 종합적인 미용 서비스",
       tagline:
         "여러분들의 반려동물에게 최고의 스타일과 케어를 선사하세요. Petbility와 함께라면, 미용 시간이 더욱 특별한 순간이 될 것입니다. 지금 바로 Petbility의 프리미엄 그루밍 서비스를 경험해보세요!",
       items: [
         {
-          title: "맞춤형 그루밍 서비스",
+          title: "맞춤형 미용 서비스",
           description:
             "반려동물의 특성에 맞춘 미용 서비스를 제공합니다. 피부 상태와 털 유형에 따라 맞춤형 케어 적용.",
-          image: "https://placehold.co/300x300",
+          image: "/services/grooming/grooming1.svg",
         },
         {
           title: "투명한 서비스 제공",
           description:
             "서비스 전후 사진 및 동영상 제공으로 보호자에게 실시간 공유. 전문가의 상세한 케어 리포트 제공.",
-          image: "https://placehold.co/300x300",
+          image: "/services/grooming/grooming2.svg",
         },
         {
           title: "다양한 케어 옵션",
           description:
             "기본 미용 외에 추가 옵션 선택 가능: 발톱 관리, 귀 청소, 치아 관리, 피부 마사지.",
-          image: "https://placehold.co/300x300",
+          image: "/services/grooming/grooming3.svg",
         },
         {
           title: "프리미엄 스타일링",
           description:
             "반려동물의 종과 털 특성을 고려한 맞춤형 스타일링 제공. 최신 트렌드를 반영한 프리미엄 미용 서비스.",
-          image: "https://placehold.co/300x300",
+          image: "/services/grooming/grooming4.svg",
         },
         {
           title: "친환경 제품 사용",
           description:
             "동물과 환경에 무해한 천연 성분 미용 제품 사용. 생분해성 타올과 도구로 환경 부담 최소화.",
-          image: "https://placehold.co/300x300",
+          image: "/services/grooming/grooming5.svg",
         },
         {
           title: "안전하고 위생적인 케어",
           description:
             "철저한 위생 관리로 감염 예방. 반려동물 전용 안전 장비와 전문가의 섬세한 케어.",
-          image: "https://placehold.co/300x300",
+          image: "/services/grooming/grooming6.svg",
         },
       ],
     },
@@ -144,31 +144,31 @@ export default function ServiceCategoryPage() {
           title: "맞춤형 목욕 서비스",
           description:
             "반려동물의 피부 상태와 털 유형에 맞는 맞춤형 목욕 서비스. 민감한 피부를 위한 특별 케어.",
-          image: "https://placehold.co/300x300",
+          image: "/services/bathing/bathing1.svg",
         },
         {
           title: "피부 건강 케어",
           description:
             "피부 상태에 맞는 전문 샴푸와 컨디셔너 사용. 건조한 피부, 민감한 피부, 알레르기 있는 반려동물을 위한 특별 케어.",
-          image: "https://placehold.co/300x300",
+          image: "/services/bathing/bathing2.svg",
         },
         {
           title: "털 관리 및 브러싱",
           description:
             "목욕 전후 전문적인 털 관리 및 브러싱. 매트 방지 및 털 건강 증진을 위한 케어.",
-          image: "https://placehold.co/300x300",
+          image: "/services/bathing/bathing3.svg",
         },
         {
           title: "목욕 후 스타일링",
           description:
             "목욕 후 전문적인 드라이 및 스타일링. 반려동물의 종과 털 특성에 맞는 스타일링 제공.",
-          image: "https://placehold.co/300x300",
+          image: "/services/bathing/bathing4.svg",
         },
         {
           title: "목욕 후 케어 리포트",
           description:
             "목욕 후 피부 상태 및 털 건강에 대한 전문가 리포트 제공. 향후 케어를 위한 맞춤형 조언.",
-          image: "https://placehold.co/300x300",
+          image: "/services/bathing/bathing5.svg",
         },
       ],
     },
@@ -270,21 +270,21 @@ export default function ServiceCategoryPage() {
           </p>
         </div>
 
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center ">
           {service.items.map((item, index) => (
             <div
               key={index}
-              className="rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition duration-300 group"
+              className="rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition duration-300 group max-w-[290px]"
             >
               <div className="relative w-full h-56">
                 <Image
                   src={item.image}
                   alt={item.title}
                   fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="object-cover scale-105 transition-transform duration-300"
                 />
               </div>
-              <div className="bg-white p-5 h-40 flex flex-col justify-between">
+              <div className="bg-white p-5 h-fit flex flex-col justify-between">
                 <h3 className="text-xl font-semibold text-gray-800">
                   {item.title}
                 </h3>

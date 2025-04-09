@@ -3,6 +3,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Clock, Calendar } from "lucide-react";
+import { businessReservationApi } from "@/api/business/business";
+import { toast } from "sonner";
+import {
+  DayOfWeek,
+  ExceptionDate,
+  WeeklySchedule,
+  ManageAvailableTimePayload,
+} from "@/types/reservation";
+import { addMinutes } from "date-fns";
 
 const DAYS = ["월", "화", "수", "목", "금", "토", "일"];
 
@@ -19,12 +28,16 @@ interface Schedule {
 interface BusinessScheduleProps {
   schedule: Schedule;
   onScheduleChange: (schedule: Schedule) => void;
+  businessId: string;
 }
 
 export default function BusinessSchedule({
   schedule,
   onScheduleChange,
+  businessId,
 }: BusinessScheduleProps) {
+  const [isSaving, setIsSaving] = useState(false);
+
   const handleTimeChange = (
     field: keyof Schedule | keyof Schedule["breakTime"],
     value: string
@@ -52,6 +65,59 @@ export default function BusinessSchedule({
       ...schedule,
       selectedDays: newSelectedDays,
     });
+  };
+  const saveSchedule = async () => {
+    try {
+      const dayMap: DayOfWeek[] = [
+        "MONDAY",
+        "TUESDAY",
+        "WEDNESDAY",
+        "THURSDAY",
+        "FRIDAY",
+        "SATURDAY",
+        "SUNDAY",
+      ];
+
+      const weekly_schedule: WeeklySchedule[] = schedule.selectedDays
+        .map((isSelected, i) =>
+          isSelected
+            ? {
+                day_of_week: dayMap[i],
+                start_time: schedule.startTime,
+                end_time: schedule.endTime,
+              }
+            : null
+        )
+        .filter((s): s is WeeklySchedule => s !== null);
+
+      const exception_dates: ExceptionDate[] = schedule.selectedDays
+        .map((isSelected, i) =>
+          isSelected && schedule.breakTime.start && schedule.breakTime.end
+            ? {
+                day_of_week: dayMap[i],
+                start_time: schedule.breakTime.start,
+                end_time: schedule.breakTime.end,
+                reason: "휴식 시간",
+              }
+            : null
+        )
+        .filter((e): e is ExceptionDate => e !== null);
+
+      const payload: ManageAvailableTimePayload = {
+        weekly_schedule,
+        exception_dates,
+      };
+
+      // ✅ 디버깅용 콘솔 로그 추가
+      console.log("📦 예약 가능 시간 payload:", payload);
+      console.log("📌 businessId:", businessId);
+
+      await businessReservationApi.manageAvailableTime(businessId, payload);
+      toast.success("예약 가능 시간이 저장되었습니다.");
+    } catch (error) {
+      console.error("예약 가능 시간 저장 실패:", error);
+      toast.error("예약 가능 시간 저장에 실패했습니다.");
+    }
   };
 
   return (
@@ -144,6 +210,16 @@ export default function BusinessSchedule({
                   </Button>
                 ))}
               </div>
+            </div>
+
+            <div className="pt-4">
+              <Button
+                onClick={saveSchedule}
+                disabled={isSaving}
+                className="w-full"
+              >
+                {isSaving ? "저장 중..." : "영업 시간 저장"}
+              </Button>
             </div>
           </div>
         </CardContent>

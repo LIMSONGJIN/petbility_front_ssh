@@ -6,7 +6,6 @@ import { useState, useRef, useEffect } from "react";
 import DaumPostcode from "react-daum-postcode";
 import { Eye, EyeOff } from "lucide-react";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 const SignUpForm = ({
   agreements,

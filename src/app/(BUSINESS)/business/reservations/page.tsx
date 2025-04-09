@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { Reservation } from "@/types/api";
-import { reservationApi } from "@/api/reservation";
+import { businessReservationApi } from "@/api/business/business";
+import { userApi } from "@/api/auth";
 import { ReservationList } from "@/components/Business/Reservation/ReservationList";
 import BusinessSchedule from "@/components/Business/Reservation/BusinessSchedule";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { useParams } from "next/navigation";
 
 interface Schedule {
   startTime: string;
@@ -20,12 +20,12 @@ interface Schedule {
 }
 
 export default function ReservationsPage() {
-  const { id } = useParams();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"list" | "schedule">("list");
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [businessId, setBusinessId] = useState<string>("");
   const [schedule, setSchedule] = useState<Schedule>({
     startTime: "09:00",
     endTime: "18:00",
@@ -42,11 +42,21 @@ export default function ReservationsPage() {
 
   const loadData = async () => {
     try {
-      const response = await reservationApi.getMyReservations();
-      setReservations(response);
+      // 현재 사용자 정보 가져오기
+      const userResponse = await userApi.getCurrentUser();
+      setBusinessId(userResponse.user_id);
+
+      // 예약 목록 가져오기
+      const reservationsResponse =
+        await businessReservationApi.getReservations();
+      setReservations(
+        Array.isArray(reservationsResponse.data)
+          ? reservationsResponse.data
+          : []
+      );
     } catch (error) {
       console.error("데이터를 불러오는데 실패했습니다:", error);
-      toast.error("예약 목록을 불러오는데 실패했습니다.");
+      toast.error("데이터를 불러오는데 실패했습니다.");
     } finally {
       setIsLoading(false);
     }
@@ -63,9 +73,10 @@ export default function ReservationsPage() {
     newStatus: Reservation["status"]
   ) => {
     try {
-      await reservationApi.updateReservation(reservationId, {
-        status: newStatus,
-      });
+      await businessReservationApi.updateReservationStatus(
+        reservationId,
+        newStatus
+      );
       setReservations((prevReservations) =>
         prevReservations.map((reservation) =>
           reservation.reservation_id === reservationId
@@ -83,7 +94,6 @@ export default function ReservationsPage() {
   const filteredReservations = reservations.filter((reservation) => {
     const statusMatch =
       filterStatus === "all" || reservation.status === filterStatus;
-    const customerMatch = !id || reservation.customer_id === id;
     const matchesSearch =
       searchQuery === "" ||
       reservation.customer_name
@@ -91,7 +101,7 @@ export default function ReservationsPage() {
         .includes(searchQuery.toLowerCase()) ||
       reservation.customer_phone.includes(searchQuery) ||
       reservation.pet_name.toLowerCase().includes(searchQuery.toLowerCase());
-    return statusMatch && customerMatch && matchesSearch;
+    return statusMatch && matchesSearch;
   });
 
   const getStatusColor = (status: string) => {
@@ -139,9 +149,7 @@ export default function ReservationsPage() {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">
-          {id ? "고객 예약 내역" : "예약 관리"}
-        </h1>
+        <h1 className="text-2xl font-bold">예약 관리</h1>
         <div className="flex gap-2 text-violet-500">
           <Button
             variant={activeTab === "list" ? "default" : "outline"}
@@ -211,6 +219,7 @@ export default function ReservationsPage() {
         <BusinessSchedule
           schedule={schedule}
           onScheduleChange={handleScheduleChange}
+          businessId={businessId}
         />
       )}
     </div>
