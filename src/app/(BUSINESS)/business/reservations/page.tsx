@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Reservation } from "@/types/api";
+import { Reservation, ReservationStatus } from "@/types/api";
 import { businessReservationApi } from "@/api/business/business";
 import { userApi } from "@/api/auth";
 import { ReservationList } from "@/components/Business/Reservation/ReservationList";
@@ -24,7 +24,9 @@ export default function ReservationsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"list" | "schedule">("list");
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [filterStatus, setFilterStatus] = useState<"all" | ReservationStatus>(
+    "all"
+  );
   const [businessId, setBusinessId] = useState<string>("");
   const [schedule, setSchedule] = useState<Schedule>({
     startTime: "09:00",
@@ -70,7 +72,7 @@ export default function ReservationsPage() {
 
   const handleStatusChange = async (
     reservationId: string,
-    newStatus: Reservation["status"]
+    newStatus: ReservationStatus
   ) => {
     try {
       await businessReservationApi.updateReservationStatus(
@@ -94,40 +96,52 @@ export default function ReservationsPage() {
   const filteredReservations = reservations.filter((reservation) => {
     const statusMatch =
       filterStatus === "all" || reservation.status === filterStatus;
+
+    // 예약한 사용자 정보 가져오기
+    const reservationDetails = async () => {
+      try {
+        // 여기서 실제로는 reservation.user_id를 사용하여 사용자 정보를 조회하는 API 호출이 필요함
+        return null;
+      } catch (error) {
+        console.error("사용자 정보 조회 실패:", error);
+        return null;
+      }
+    };
+
+    // 기본 검색은 예약 ID와 메모 검색으로 대체
     const matchesSearch =
       searchQuery === "" ||
-      reservation.customer_name
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
-      reservation.customer_phone.includes(searchQuery) ||
-      reservation.pet_name.toLowerCase().includes(searchQuery.toLowerCase());
+      reservation.reservation_id.includes(searchQuery) ||
+      (reservation.notes &&
+        reservation.notes.toLowerCase().includes(searchQuery.toLowerCase()));
+
     return statusMatch && matchesSearch;
   });
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: ReservationStatus) => {
     switch (status) {
-      case "pending":
+      case ReservationStatus.PENDING:
         return "text-yellow-600";
-      case "confirmed":
+      case ReservationStatus.CONFIRMED:
         return "text-blue-600";
-      case "completed":
+      case ReservationStatus.COMPLETED:
         return "text-green-600";
-      case "cancelled":
+      case ReservationStatus.CANCELED:
         return "text-red-600";
       default:
         return "text-gray-600";
     }
   };
 
-  const getStatusText = (status: string) => {
+  const getStatusText = (status: ReservationStatus) => {
     switch (status) {
-      case "pending":
+      case ReservationStatus.PENDING:
         return "결제 대기";
-      case "confirmed":
+      case ReservationStatus.CONFIRMED:
         return "예약 확정";
-      case "completed":
+      case ReservationStatus.COMPLETED:
         return "서비스 완료";
-      case "cancelled":
+      case ReservationStatus.CANCELED:
         return "예약 취소";
       default:
         return status;
@@ -179,30 +193,46 @@ export default function ReservationsPage() {
               전체
             </Button>
             <Button
-              variant={filterStatus === "pending" ? "default" : "outline"}
+              variant={
+                filterStatus === ReservationStatus.PENDING
+                  ? "default"
+                  : "outline"
+              }
               size="sm"
-              onClick={() => setFilterStatus("pending")}
+              onClick={() => setFilterStatus(ReservationStatus.PENDING)}
             >
               결제 대기
             </Button>
             <Button
-              variant={filterStatus === "confirmed" ? "default" : "outline"}
+              variant={
+                filterStatus === ReservationStatus.CONFIRMED
+                  ? "default"
+                  : "outline"
+              }
               size="sm"
-              onClick={() => setFilterStatus("confirmed")}
+              onClick={() => setFilterStatus(ReservationStatus.CONFIRMED)}
             >
               예약 확정
             </Button>
             <Button
-              variant={filterStatus === "completed" ? "default" : "outline"}
+              variant={
+                filterStatus === ReservationStatus.COMPLETED
+                  ? "default"
+                  : "outline"
+              }
               size="sm"
-              onClick={() => setFilterStatus("completed")}
+              onClick={() => setFilterStatus(ReservationStatus.COMPLETED)}
             >
               서비스 완료
             </Button>
             <Button
-              variant={filterStatus === "cancelled" ? "default" : "outline"}
+              variant={
+                filterStatus === ReservationStatus.CANCELED
+                  ? "default"
+                  : "outline"
+              }
               size="sm"
-              onClick={() => setFilterStatus("cancelled")}
+              onClick={() => setFilterStatus(ReservationStatus.CANCELED)}
             >
               예약 취소
             </Button>

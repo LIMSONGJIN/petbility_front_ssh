@@ -6,19 +6,62 @@ import {
   AvailableTime,
 } from "@/types/api";
 import { dummyReservations } from "@/data/dummy/business";
-import { ManageAvailableTimePayload } from "@/types/reservation";
+import {
+  BlockTimePayload,
+  ManageBusinessSchedulePayload,
+  AvailableTimeSlots,
+  BusinessSchedule,
+} from "@/types/reservation";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
-interface AvailableTimeData {
-  type: "WEEKLY" | "EXCEPTION";
-  day_of_week?: number;
-  date?: string;
-  start_time: string;
-  end_time: string;
-  available: boolean;
-  reason?: string;
+// 비즈니스 서비스 관련 API 응답 타입
+export interface BusinessServiceResponse {
+  id: string;
+  business_id: string;
+  service_id: string;
+  is_active: boolean;
 }
+
+// 비즈니스 서비스 관련 API
+export const businessServiceApi = {
+  // 서비스 활성화/비활성화
+  updateServiceStatus: async (
+    serviceId: string,
+    status: "active" | "inactive"
+  ): Promise<BusinessServiceResponse> => {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("인증 토큰이 없습니다.");
+
+    console.log("API 호출 → PATCH", {
+      serviceId,
+      status,
+      token,
+    });
+
+    const response = await fetch(
+      `${API_URL}/business/reservations/my-services/${serviceId}/status`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status }),
+      }
+    );
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error("서비스를 찾을 수 없습니다.");
+      }
+      const errorData = await response.json();
+      throw new Error(errorData.message || "서비스 상태 변경에 실패했습니다.");
+    }
+
+    return response.json();
+  },
+};
 
 // 비즈니스 예약 관련 API
 export const businessReservationApi = {
@@ -52,11 +95,11 @@ export const businessReservationApi = {
       let filteredReservations = dummyReservations;
       if (params?.user_id) {
         filteredReservations = dummyReservations.filter(
-          (r) => r.customer_id === params.user_id
+          (r) => r.user_id === params.user_id
         );
       }
       return {
-        data: filteredReservations as unknown as Reservation[],
+        data: filteredReservations as Reservation[],
         total: filteredReservations.length,
         page: params?.page || 1,
         limit: params?.limit || 10,
@@ -91,7 +134,7 @@ export const businessReservationApi = {
         (r) => r.reservation_id === id
       );
       if (!reservation) throw new Error("예약을 찾을 수 없습니다.");
-      return reservation as unknown as Reservation;
+      return reservation as Reservation;
     }
   },
 
@@ -122,18 +165,19 @@ export const businessReservationApi = {
 
     return response.json();
   },
+};
 
-  // 예약 가능 시간 관리
-  manageAvailableTime: async (
+// 비즈니스 스케줄 관련 API
+export const businessScheduleApi = {
+  // 비즈니스 영업 일정 관리
+  manageBusinessSchedule: async (
     businessId: string,
-    payload: ManageAvailableTimePayload
-  ): Promise<any> => {
+    payload: ManageBusinessSchedulePayload
+  ): Promise<void> => {
     const token = localStorage.getItem("token");
     if (!token) throw new Error("인증 토큰이 없습니다.");
 
-    const endpoint = `${API_URL}/business/reservations/${businessId}/available-time`;
-
-    const response = await fetch(endpoint, {
+    const response = await fetch(`${API_URL}/business/schedule/${businessId}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -144,48 +188,40 @@ export const businessReservationApi = {
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(
-        errorData.message || "예약 가능 시간 관리에 실패했습니다."
-      );
+      throw new Error(errorData.message || "영업 일정 설정에 실패했습니다.");
     }
-
-    return await response.json();
   },
 
-  // 특정 서비스의 예약 가능 시간 조회
-  getAvailableTimes: async (serviceId: string): Promise<AvailableTime[]> => {
+  // 비즈니스 영업 일정 조회
+  getBusinessSchedule: async (
+    businessId: string
+  ): Promise<ManageBusinessSchedulePayload> => {
     const token = localStorage.getItem("token");
     if (!token) throw new Error("인증 토큰이 없습니다.");
 
-    const response = await fetch(
-      `${API_URL}/business/reservations/available-time/${serviceId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await fetch(`${API_URL}/business/schedule/${businessId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(
-        errorData.message || "예약 가능 시간을 불러오는데 실패했습니다."
-      );
+      throw new Error("영업 일정을 불러오는데 실패했습니다.");
     }
 
     return response.json();
   },
 
   // 특정 날짜의 예약 가능 시간 조회
-  getAvailableTimesByDate: async (
-    serviceId: string,
+  getAvailableTimeSlots: async (
+    businessId: string,
     date: string
-  ): Promise<AvailableTime[]> => {
+  ): Promise<AvailableTimeSlots> => {
     const token = localStorage.getItem("token");
     if (!token) throw new Error("인증 토큰이 없습니다.");
 
     const response = await fetch(
-      `${API_URL}/business/reservations/available-time/${serviceId}/date?date=${date}`,
+      `${API_URL}/business/schedule/${businessId}/date?date=${date}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -194,9 +230,30 @@ export const businessReservationApi = {
     );
 
     if (!response.ok) {
+      throw new Error("예약 가능 시간을 불러오는데 실패했습니다.");
+    }
+
+    return response.json();
+  },
+};
+
+// 비즈니스 API
+export const businessApi = {
+  // 사용자 목록 조회
+  getUsers: async (): Promise<any[]> => {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("인증 토큰이 없습니다.");
+
+    const response = await fetch(`${API_URL}/business/users`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
       const errorData = await response.json();
       throw new Error(
-        errorData.message || "예약 가능 시간을 불러오는데 실패했습니다."
+        errorData.message || "사용자 목록을 불러오는데 실패했습니다."
       );
     }
 

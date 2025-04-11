@@ -66,7 +66,7 @@ export default function Footer() {
 
         {/* SNS & 뉴스레터 */}
         <div>
-          <h3 className="text-lg font-semibold mb-3">팔로우 & 구독</h3>
+          <h3 className="text-lg font-semibold mb-3">팔로우</h3>
           <div className="flex flex-col gap-2">
             <Link
               href="#"

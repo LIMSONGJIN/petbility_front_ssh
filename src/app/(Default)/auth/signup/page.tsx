@@ -215,12 +215,6 @@ const SignUpPage = () => {
       </div>
 
       <SignUpForm agreements={agreements} />
-      <Link
-        href="/auth/signin"
-        className="underline text-blue-500 hover:text-blue-700"
-      >
-        로그인 하러가기
-      </Link>
     </motion.div>
   );
 };

@@ -6,12 +6,14 @@ import { CheckCircle2, Circle } from "lucide-react";
 interface ServiceCardProps {
   category: ServiceCategory;
   isActive: boolean;
+  serviceId?: string;
   onToggle: () => void;
 }
 
 export function ServiceCard({
   category,
   isActive,
+  serviceId,
   onToggle,
 }: ServiceCardProps) {
   return (
@@ -36,6 +38,9 @@ export function ServiceCard({
         <div>
           <h2 className="text-lg font-semibold mb-2">{category.name}</h2>
           <p className="text-sm text-gray-600 mb-4">{category.description}</p>
+          {serviceId && (
+            <p className="text-xs text-gray-400 mt-1">ID: {serviceId}</p>
+          )}
         </div>
         <div className="flex items-center justify-between">
           <span
@@ -54,6 +59,7 @@ export function ServiceCard({
                 ? "text-red-500 hover:text-red-600"
                 : "text-violet-500 hover:text-violet-600"
             }
+            disabled={!serviceId}
           >
             {isActive ? "운영 중지" : "운영 시작"}
           </Button>

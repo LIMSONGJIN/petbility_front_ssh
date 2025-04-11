@@ -54,13 +54,15 @@ export interface Customer {
 export interface Reservation {
   reservation_id: string;
   user_id: string;
-  pet_id: string;
-  service_id: string;
   business_id: string;
+  service_id?: string;
+  pet_id?: string;
   status: ReservationStatus;
   notes?: string;
   price: number;
-  reserved_at: string;
+  start_time: string;
+  end_time: string;
+  is_available: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -99,8 +101,4 @@ export interface BusinessStats {
   total_services: number;
   total_sales: number;
   recent_reservations: Reservation[];
-  top_services: {
-    service_name: string;
-    count: number;
-  }[];
 }

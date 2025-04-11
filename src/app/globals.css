@@ -93,6 +93,10 @@ body {
   .header-profile-link {
     @apply block px-4 header-btn-text hover:bg-gray-100 transition;
   }
+
+  .loading-spinner {
+    @apply animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-violet-500;
+  }
 }
 @layer utilities {
   .button--nina {

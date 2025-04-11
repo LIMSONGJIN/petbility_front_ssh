@@ -9,7 +9,8 @@ import { Search, User, Phone, Calendar, MapPin } from "lucide-react";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { Customer } from "@/types/business";
-import { userApi } from "@/api/business"; // API import
+import { businessApi } from "@/api/business/business";
+import { toast } from "react-toastify";
 
 export default function UserManagementPage() {
   const router = useRouter();
@@ -21,10 +22,11 @@ export default function UserManagementPage() {
     const fetchUsers = async () => {
       setIsLoading(true);
       try {
-        const { data } = await userApi.getUsers();
+        const data = await businessApi.getUsers();
         setUsers(data);
       } catch (error) {
-        console.error("사용자 목록 불러오기 실패:", error);
+        console.error("Failed to fetch users:", error);
+        toast.error("사용자 목록을 불러오는데 실패했습니다.");
       } finally {
         setIsLoading(false);
       }

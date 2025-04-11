@@ -1,9 +1,10 @@
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import { ReservationStatus } from "@/types/api";
 
 interface ReservationFiltersProps {
   onSearchChange: (query: string) => void;
-  onStatusChange: (status: string) => void;
+  onStatusChange: (status: "all" | ReservationStatus) => void;
 }
 
 export default function ReservationFilters({
@@ -23,13 +24,15 @@ export default function ReservationFilters({
       </div>
       <select
         className="px-4 py-2 border rounded-md"
-        onChange={(e) => onStatusChange(e.target.value)}
+        onChange={(e) =>
+          onStatusChange(e.target.value as "all" | ReservationStatus)
+        }
       >
         <option value="all">전체</option>
-        <option value="pending">대기 중</option>
-        <option value="confirmed">확정됨</option>
-        <option value="completed">완료됨</option>
-        <option value="cancelled">취소됨</option>
+        <option value={ReservationStatus.PENDING}>대기 중</option>
+        <option value={ReservationStatus.CONFIRMED}>확정됨</option>
+        <option value={ReservationStatus.COMPLETED}>완료됨</option>
+        <option value={ReservationStatus.CANCELED}>취소됨</option>
       </select>
     </div>
   );

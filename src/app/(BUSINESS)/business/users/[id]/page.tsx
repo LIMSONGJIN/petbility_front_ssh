@@ -10,8 +10,8 @@ import { User, Phone, MapPin, Calendar, ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { Customer } from "@/types/business";
-import { userApi } from "@/api/business";
 import { toast } from "sonner";
+import { businessUserApi } from "@/api/business/business";
 
 export default function UserDetailPage() {
   const params = useParams();
@@ -25,7 +25,7 @@ export default function UserDetailPage() {
     const fetchUser = async () => {
       setIsLoading(true);
       try {
-        const response = await userApi.getUser(params.id as string);
+        const response = await businessUserApi.getUser(params.id as string);
         setUser(response);
         setEditedUser(response);
       } catch (error) {
@@ -40,7 +40,7 @@ export default function UserDetailPage() {
 
   const handleSave = async () => {
     try {
-      await userApi.updateUser(params.id as string, editedUser);
+      await businessUserApi.updateUser(params.id as string, editedUser);
       setUser({ ...user, ...editedUser } as Customer);
       setIsEditing(false);
       toast.success("사용자 정보가 업데이트되었습니다.");

@@ -6,6 +6,9 @@ import { useUser } from "@/hooks/useUser";
 import { usePathname, useRouter } from "next/navigation";
 import { UserRole } from "@/types/api";
 
+// 보호된 경로 (인증 필요)
+const protectedPaths = ["/admin", "/business"];
+
 export default function AuthProvider({
   children,
 }: {
@@ -36,64 +39,38 @@ export default function AuthProvider({
     // 초기화가 완료되지 않았으면 아무것도 하지 않음
     if (!isInitialized || isAuthLoading || isUserLoading) return;
 
-    // 공개 페이지 목록 (인증 없이 접근 가능)
-    const publicPaths = [
-      "/auth/signin",
-      "/auth/signup",
-      "/auth/reset",
-      "/auth/confirm",
-      "/auth/callback",
-      "/",
-      "/about",
-      "/contact",
-      "/services",
-      "/products",
-      "/community",
-    ];
-
-    // 현재 경로가 공개 페이지인지 확인
-    const isPublicPath = publicPaths.some(
-      (path) => pathname === path || pathname.startsWith(`${path}/`)
+    // 현재 경로가 보호된 경로인지 확인
+    const isProtectedPath = protectedPaths.some((path) =>
+      pathname.startsWith(path)
     );
 
-    // 인증되지 않았고 공개 페이지가 아닌 경우에만 로그인 페이지로 리다이렉트
-    if (!isAuthenticated && !isPublicPath) {
-      router.replace("/auth/signin");
+    // 보호된 경로가 아니면 아무런 제한 없이 접근 가능
+    if (!isProtectedPath) {
+      return;
+    }
+
+    // 인증되지 않았고 보호된 경로인 경우 로그인 페이지로 리다이렉트
+    if (!isAuthenticated) {
+      router.replace(`/auth/signin?redirectTo=${pathname}`);
       return;
     }
 
     // 인증되었고 사용자 정보가 있는 경우 역할에 따른 라우팅
     if (isAuthenticated && user) {
-      switch (user.role) {
-        case UserRole.ADMIN:
-          // 어드민은 /admin 경로와 공개 경로에 접근 가능
-          if (
-            !pathname.startsWith("/admin") &&
-            !isPublicPath &&
-            pathname !== "/"
-          ) {
-            router.replace("/admin");
-          }
-          break;
-        case UserRole.BUSINESS:
-          // 비즈니스 사용자는 /business 경로와 공개 경로에 접근 가능
-          if (
-            !pathname.startsWith("/business") &&
-            !isPublicPath &&
-            pathname !== "/"
-          ) {
-            router.replace("/business");
-          }
-          break;
-        case UserRole.USER:
-          // 일반 사용자는 /admin과 /business 경로에 접근 불가
-          if (
-            pathname.startsWith("/admin") ||
-            pathname.startsWith("/business")
-          ) {
-            router.replace("/");
-          }
-          break;
+      if (pathname.startsWith("/admin") && user.role !== UserRole.ADMIN) {
+        // 관리자가 아니면 admin 접근 불가
+        router.replace(user.role === UserRole.BUSINESS ? "/business" : "/");
+        return;
+      }
+
+      if (
+        pathname.startsWith("/business") &&
+        user.role !== UserRole.ADMIN &&
+        user.role !== UserRole.BUSINESS
+      ) {
+        // 관리자나 비즈니스 사용자가 아니면 business 접근 불가
+        router.replace("/");
+        return;
       }
     }
   }, [

@@ -1,77 +1,85 @@
-export type ReservationStatus =
-  | "PENDING"
-  | "CONFIRMED"
-  | "COMPLETED"
-  | "CANCELED"
-  | "BLOCKED";
+import { Service, ReservationStatus } from "./api";
 
-export interface Reservation {
-  reservation_id: string;
-  service_id: string | null;
-  service_name?: string;
-  user_id: string;
+export interface ReservationPayload {
+  service_id: string;
   business_id: string;
-  pet_id: string | null;
+  pet_id: string;
+  reservation_date: string;
   start_time: string;
   end_time: string;
-  is_available: boolean;
-  status: ReservationStatus;
-  price?: number;
-  note?: string;
-  created_at: string;
-  updated_at: string;
-  customer_name?: string;
-  customer_phone?: string;
-  pet_name?: string;
-  pet_type?: string;
+  memo?: string;
 }
 
-export interface AvailableTime {
-  date: string;
-  times: {
-    start_time: string;
-    end_time: string;
-  }[];
-}
-
-export interface ReservationStatusUpdate {
-  status: ReservationStatus;
-}
-
-export type DayOfWeek =
-  | "MONDAY"
-  | "TUESDAY"
-  | "WEDNESDAY"
-  | "THURSDAY"
-  | "FRIDAY"
-  | "SATURDAY"
-  | "SUNDAY";
-
-export interface BlockTimeRequest {
-  business_id: string;
+export interface BlockTimePayload {
+  reservation_date: string;
   start_time: string;
   end_time: string;
-  is_available: boolean;
-  repeat_weekly?: boolean;
-  day_of_week?: DayOfWeek;
-  note?: string;
-}
-
-export interface WeeklySchedule {
-  day_of_week: DayOfWeek;
-  start_time: string;
-  end_time: string;
-}
-
-export interface ExceptionDate {
-  date: string;
-  day_of_week: DayOfWeek;
-  start_time: string;
-  end_time: string;
-  reason: string;
+  service_id?: string;
+  memo?: string;
 }
 
 export interface ManageAvailableTimePayload {
-  weekly_schedule: WeeklySchedule[];
-  exception_dates: ExceptionDate[];
+  weeklySchedule: WeeklySchedule[];
+  exceptionDates: ExceptionDate[];
+  schedule: {
+    startTime: string;
+    endTime: string;
+    breakTime: {
+      start: string;
+      end: string;
+    };
+    selectedDays: boolean[];
+  };
+}
+
+export interface WeeklySchedule {
+  day_of_week: string; // 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'
+  start_time: string; // 'HH:MM' 형식 (예: '09:00')
+  end_time: string; // 'HH:MM' 형식 (예: '18:00')
+  is_day_off?: boolean; // 휴무일 여부
+}
+
+export interface ExceptionDate {
+  day_of_week: string; // 'MONDAY' 또는 '2025-04-10'
+  start_time: string; // ISO 형식: '2025-04-10T12:00:00Z'
+  end_time: string; // ISO 형식
+  reason?: string;
+}
+
+export type DayOfWeek = "MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT" | "SUN";
+
+// 비즈니스 스케줄 관리 페이로드
+export interface ManageBusinessSchedulePayload {
+  schedule: {
+    selectedDays: boolean[]; // 길이 7, [일, 월, 화, 수, 목, 금, 토]
+    startTime: string; // HH:mm
+    endTime: string; // HH:mm
+    breakTime?: {
+      start: string; // HH:mm
+      end: string; // HH:mm
+    };
+  };
+}
+
+// 비즈니스 스케줄 정보
+export interface BusinessSchedule {
+  weeklySchedule: WeeklySchedule[];
+  exceptionDates: ExceptionDate[];
+}
+
+// 특정 날짜의 예약 가능 시간대
+export interface AvailableTimeSlots {
+  date: string;
+  slots: {
+    startTime: string;
+    endTime: string;
+    isAvailable: boolean;
+  }[];
+}
+
+// 예약 생성 결과
+export interface ReservationResult {
+  reservation_id: string;
+  status: ReservationStatus;
+  message: string;
 }

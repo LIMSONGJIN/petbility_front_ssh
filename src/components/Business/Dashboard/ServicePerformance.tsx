@@ -39,13 +39,13 @@ export default function ServicePerformance() {
           const thirtyDaysAgo = new Date();
           thirtyDaysAgo.setDate(today.getDate() - 30);
           const recentReservations = serviceReservations.filter(
-            (res) => new Date(res.reservation_date) >= thirtyDaysAgo
+            (res) => new Date(res.start_time) >= thirtyDaysAgo
           );
 
           // 전반기(15일)와 후반기(15일) 예약 건수 계산
           const firstHalfReservations = recentReservations.filter(
             (res) =>
-              new Date(res.reservation_date) <
+              new Date(res.start_time) <
               new Date(today.getTime() - 15 * 24 * 60 * 60 * 1000)
           ).length;
           const secondHalfReservations =

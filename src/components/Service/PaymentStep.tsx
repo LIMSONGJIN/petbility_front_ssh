@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { mockReservationData, services } from "@/data/service";
 import { ServiceCategory } from "@/types/api";
+import { serviceApi } from "@/api/service";
+import { toast } from "react-toastify";
 
 interface PaymentStepProps {
   onNext: (notes: string) => void;
@@ -10,6 +12,7 @@ interface PaymentStepProps {
   selectedDate: Date;
   selectedTime: string;
   selectedPetId: string;
+  businessName: string;
 }
 
 export default function PaymentStep({
@@ -19,20 +22,51 @@ export default function PaymentStep({
   selectedDate,
   selectedTime,
   selectedPetId,
+  businessName,
 }: PaymentStepProps) {
   const [notes, setNotes] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [serviceDetails, setServiceDetails] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // 서비스 정보 불러오기
+  useEffect(() => {
+    const fetchServiceDetails = async () => {
+      try {
+        setIsLoading(true);
+        const data = await serviceApi.getServiceById(serviceType);
+        setServiceDetails(data);
+      } catch (error) {
+        console.error("Failed to fetch service details:", error);
+        toast.error("서비스 정보를 불러오는데 실패했습니다.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (serviceType) {
+      fetchServiceDetails();
+    }
+  }, [serviceType]);
 
   const selectedPet = mockReservationData.pets.find(
     (pet) => pet.id === selectedPetId
   );
+
   const servicePrice =
+    serviceDetails?.price ||
     mockReservationData.servicePrices[
       serviceType as keyof typeof mockReservationData.servicePrices
-    ] || 0;
+    ] ||
+    0;
 
   // 서비스 타입을 사용자가 이해하기 쉬운 이름으로 매핑
   const getServiceName = (type: string): string => {
+    // 서비스 상세 정보가 로드된 경우
+    if (serviceDetails?.name) {
+      return serviceDetails.name;
+    }
+
     // 서비스 ID로 서비스 목록에서 찾기
     const service = services.find((s) => s.service_id === type);
     if (service) {
@@ -84,6 +118,22 @@ export default function PaymentStep({
     });
   };
 
+  if (isLoading) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        className="space-y-6"
+      >
+        <div className="bg-white p-6 rounded-lg shadow-md flex justify-center items-center py-12">
+          <div className="w-8 h-8 border-2 border-violet-600 rounded-full border-t-transparent animate-spin"></div>
+          <span className="ml-3">예약 정보 로딩 중...</span>
+        </div>
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -100,6 +150,7 @@ export default function PaymentStep({
           <div className="bg-gray-50 p-4 rounded-lg">
             <h3 className="font-semibold text-gray-700 mb-2">예약 정보</h3>
             <div className="space-y-2 text-gray-600">
+              <p>업체: {businessName}</p>
               <p>날짜: {formatDate(selectedDate)}</p>
               <p>시간: {selectedTime}</p>
               <p>

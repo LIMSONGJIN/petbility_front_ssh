@@ -7,11 +7,16 @@ export enum ServiceCategory {
   OTHER_CARE = "other_care", // 기타 케어
 }
 
-export type ReservationStatus =
-  | "pending"
-  | "confirmed"
-  | "completed"
-  | "cancelled";
+export enum ReservationStatus {
+  PENDING = "PENDING",
+  CONFIRMED = "CONFIRMED",
+  COMPLETED = "COMPLETED",
+  CANCELED = "CANCELED",
+  REJECTED = "REJECTED",
+  IN_PROGRESS = "IN_PROGRESS",
+  NO_SHOW = "NO_SHOW",
+  BLOCKED = "BLOCKED",
+}
 
 export enum ScheduleType {
   WEEKLY = "WEEKLY",
@@ -93,37 +98,35 @@ export interface AvailableTime {
 
 export interface Reservation {
   reservation_id: string;
-  customer_id: string;
-  customer_name: string;
-  customer_phone: string;
-  pet_id: string;
-  pet_name: string;
-  pet_type: string;
-  service_id: string;
-  service_name: string;
-  reservation_date: string;
-  start_time: string;
-  end_time: string;
+  user_id: string;
+  business_id: string;
+  service_id?: string;
+  pet_id?: string;
   status: ReservationStatus;
-  price: number;
-  memo?: string;
+  notes?: string;
   created_at: string;
   updated_at: string;
+  price: number;
+  start_time: string;
+  end_time: string;
+  is_available: boolean;
 }
 
 export interface CreateReservationData {
-  customer_id: string;
-  pet_id: string;
-  service_id: string;
-  reservation_date: string;
+  user_id?: string;
+  business_id: string;
+  service_id?: string;
+  pet_id?: string;
   start_time: string;
   end_time: string;
-  memo?: string;
+  is_available?: boolean;
+  notes?: string;
+  price?: number;
 }
 
 export interface UpdateReservationData {
   status?: ReservationStatus;
-  memo?: string;
+  notes?: string;
 }
 
 export interface Notification {

@@ -18,9 +18,22 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
+// 확장된 예약 정보 타입 정의
+interface ReservationWithDetails extends Reservation {
+  customer_name?: string;
+  customer_phone?: string;
+  service_name?: string;
+  reservation_date?: string;
+  pet_name?: string;
+  pet_type?: string;
+  memo?: string;
+}
+
 export default function ReservationDetailPage() {
   const params = useParams();
-  const [reservation, setReservation] = useState<Reservation | null>(null);
+  const [reservation, setReservation] = useState<ReservationWithDetails | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -41,14 +54,14 @@ export default function ReservationDetailPage() {
     }
   };
 
-  const handleStatusUpdate = async (status: string) => {
+  const handleStatusUpdate = async (status: ReservationStatus) => {
     if (!reservation) return;
 
     try {
       const updatedReservation =
         await businessReservationApi.updateReservationStatus(
           reservation.reservation_id,
-          status as ReservationStatus
+          status
         );
       setReservation(updatedReservation);
       toast.success("예약 상태가 업데이트되었습니다.");
@@ -58,30 +71,30 @@ export default function ReservationDetailPage() {
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: ReservationStatus) => {
     switch (status) {
-      case "pending":
+      case ReservationStatus.PENDING:
         return "bg-yellow-100 text-yellow-800";
-      case "confirmed":
+      case ReservationStatus.CONFIRMED:
         return "bg-blue-100 text-blue-800";
-      case "completed":
+      case ReservationStatus.COMPLETED:
         return "bg-green-100 text-green-800";
-      case "cancelled":
+      case ReservationStatus.CANCELED:
         return "bg-red-100 text-red-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
   };
 
-  const getStatusText = (status: string) => {
+  const getStatusText = (status: ReservationStatus) => {
     switch (status) {
-      case "pending":
+      case ReservationStatus.PENDING:
         return "대기중";
-      case "confirmed":
+      case ReservationStatus.CONFIRMED:
         return "확정";
-      case "completed":
+      case ReservationStatus.COMPLETED:
         return "완료";
-      case "cancelled":
+      case ReservationStatus.CANCELED:
         return "취소";
       default:
         return status;
@@ -133,9 +146,13 @@ export default function ReservationDetailPage() {
               <div>
                 <p className="text-sm text-gray-500">예약 날짜</p>
                 <p className="text-gray-900">
-                  {format(new Date(reservation.reservation_date), "PPP", {
-                    locale: ko,
-                  })}
+                  {reservation.reservation_date
+                    ? format(new Date(reservation.reservation_date), "PPP", {
+                        locale: ko,
+                      })
+                    : format(new Date(reservation.start_time), "PPP", {
+                        locale: ko,
+                      })}
                 </p>
               </div>
             </div>
@@ -200,25 +217,27 @@ export default function ReservationDetailPage() {
           </div>
 
           <div className="flex gap-2">
-            {reservation.status === "pending" && (
+            {reservation.status === ReservationStatus.PENDING && (
               <>
                 <button
-                  onClick={() => handleStatusUpdate("confirmed")}
+                  onClick={() =>
+                    handleStatusUpdate(ReservationStatus.CONFIRMED)
+                  }
                   className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                 >
                   예약 확정
                 </button>
                 <button
-                  onClick={() => handleStatusUpdate("cancelled")}
+                  onClick={() => handleStatusUpdate(ReservationStatus.CANCELED)}
                   className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
                 >
                   예약 취소
                 </button>
               </>
             )}
-            {reservation.status === "confirmed" && (
+            {reservation.status === ReservationStatus.CONFIRMED && (
               <button
-                onClick={() => handleStatusUpdate("completed")}
+                onClick={() => handleStatusUpdate(ReservationStatus.COMPLETED)}
                 className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
               >
                 서비스 완료

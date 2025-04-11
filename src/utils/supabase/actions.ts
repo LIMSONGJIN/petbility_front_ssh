@@ -96,7 +96,7 @@ const signupWithEmailPassword = async (prev: any, formData: FormData) => {
     return { message: "백엔드 사용자 저장에 실패했습니다." };
   }
 
-  return redirect("/");
+  return redirect("/auth/callback/client");
 };
 
 const uploadProfileImage = async (file: File) => {

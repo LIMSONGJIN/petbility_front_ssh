@@ -1,17 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { AnimatePresence } from "framer-motion";
-import AddressStep from "@/components/Service/AddressStep";
+import BusinessSelectionStep from "@/components/Service/BusinessSelectionStep";
 import DateTimeStep from "@/components/Service/DateTimeStep";
 import PetSelectionStep from "@/components/Service/PetSelectionStep";
 import PaymentStep from "@/components/Service/PaymentStep";
 import CompletionStep from "@/components/Service/CompletionStep";
 import { mockReservationData } from "@/data/service";
+import { userReservationApi } from "@/api/user/user";
+import { Business, ServiceWithBusiness } from "@/api/user/user";
+import { toast } from "react-toastify";
+import { CreateReservationData } from "@/types/api";
 
 interface ReservationData {
-  address: string;
+  business_id: string;
+  business_name: string;
   date: Date | null;
   time: string;
   petId: string;
@@ -22,16 +27,62 @@ export default function ReservationPage() {
   const { service_id } = useParams();
   const [currentStep, setCurrentStep] = useState(1);
   const [reservationData, setReservationData] = useState<ReservationData>({
-    address: mockReservationData.userAddress.address,
+    business_id: "",
+    business_name: "",
     date: null,
     time: "",
     petId: "",
     notes: "",
   });
   const [reservationId, setReservationId] = useState("");
+  const [serviceBusinesses, setServiceBusinesses] = useState<
+    ServiceWithBusiness[]
+  >([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [serviceName, setServiceName] = useState("");
 
-  const handleAddressChange = (newAddress: string) => {
-    setReservationData((prev) => ({ ...prev, address: newAddress }));
+  // 서비스 상세 및 사업자 목록 불러오기
+  useEffect(() => {
+    const fetchBusinesses = async () => {
+      try {
+        setIsLoading(true);
+        // 서비스 상세 정보 로드
+        try {
+          const serviceData = await userReservationApi.getAllServices();
+          const service = serviceData.find((s) => s.service_id === service_id);
+          if (service) {
+            setServiceName(service.name);
+          }
+        } catch (error) {
+          console.error("Failed to fetch service:", error);
+        }
+
+        // 사업자 목록 로드
+        const data = await userReservationApi.getBusinessesByServiceId(
+          service_id as string
+        );
+        setServiceBusinesses(data);
+      } catch (error) {
+        console.error("Failed to fetch businesses:", error);
+        toast.error("사업자 목록을 불러오는데 실패했습니다.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (service_id) {
+      fetchBusinesses();
+    }
+  }, [service_id]);
+
+  const handleBusinessSelect = (businessId: string, businessName: string) => {
+    setReservationData((prev) => ({
+      ...prev,
+      business_id: businessId,
+      business_name: businessName,
+    }));
+    // 사업자 선택 후 다음 단계로 넘어가기
+    setCurrentStep(2);
   };
 
   const handleDateTimeSelect = (date: Date, time: string) => {
@@ -46,21 +97,47 @@ export default function ReservationPage() {
     setCurrentStep(4);
   };
 
-  const handlePaymentComplete = (notes: string) => {
-    setReservationData((prev) => ({ ...prev, notes }));
-    // 실제 예약 ID 생성 로직은 여기에 구현
-    setReservationId(`RES-${Date.now().toString().slice(-6)}`);
-    // 결제 완료 후 다음 단계로 넘어가기
-    setCurrentStep(5);
+  const handlePaymentComplete = async (notes: string) => {
+    try {
+      setReservationData((prev) => ({ ...prev, notes }));
+
+      // API 호출하여 예약 생성
+      const startTime = `${reservationData.date?.toISOString().split("T")[0]}T${
+        reservationData.time
+      }:00`;
+      // 서비스 시간을 1시간으로 가정
+      const endTimeDate = new Date(
+        new Date(startTime).getTime() + 60 * 60 * 1000
+      );
+      const endTime = endTimeDate.toISOString();
+
+      const result = await userReservationApi.createReservation({
+        service_id: service_id as string,
+        pet_id: reservationData.petId,
+        start_time: startTime,
+        end_time: endTime,
+        notes: notes,
+        business_id: reservationData.business_id,
+      });
+
+      // 예약 ID 설정
+      setReservationId(result.reservation_id);
+      // 결제 완료 후 다음 단계로 넘어가기
+      setCurrentStep(5);
+    } catch (error) {
+      console.error("Failed to create reservation:", error);
+      toast.error("예약 생성에 실패했습니다. 다시 시도해주세요.");
+    }
   };
 
   const renderStep = () => {
     switch (currentStep) {
       case 1:
         return (
-          <AddressStep
-            onNext={() => setCurrentStep(2)}
-            onAddressChange={handleAddressChange}
+          <BusinessSelectionStep
+            serviceBusinesses={serviceBusinesses}
+            isLoading={isLoading}
+            onNext={handleBusinessSelect}
           />
         );
       case 2:
@@ -68,6 +145,8 @@ export default function ReservationPage() {
           <DateTimeStep
             onNext={handleDateTimeSelect}
             onBack={() => setCurrentStep(1)}
+            businessId={reservationData.business_id}
+            serviceId={service_id as string}
           />
         );
       case 3:
@@ -86,6 +165,7 @@ export default function ReservationPage() {
             selectedDate={reservationData.date!}
             selectedTime={reservationData.time}
             selectedPetId={reservationData.petId}
+            businessName={reservationData.business_name}
           />
         );
       case 5:
@@ -95,19 +175,32 @@ export default function ReservationPage() {
     }
   };
 
+  // 예약 단계 이름 업데이트
+  const reservationSteps = [
+    { id: 1, title: "서비스 제공자" },
+    { id: 2, title: "날짜 및 시간" },
+    { id: 3, title: "반려동물 선택" },
+    { id: 4, title: "메모 및 결제" },
+    { id: 5, title: "예약 완료" },
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-3xl mx-auto px-4">
+        {serviceName && (
+          <h1 className="text-2xl font-bold text-center mb-6 text-violet-700">
+            {serviceName} 예약
+          </h1>
+        )}
+
         {/* 진행 단계 표시 */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
-            {mockReservationData.reservationSteps.map((step, index) => (
+            {reservationSteps.map((step, index) => (
               <div
                 key={step.id}
                 className={`flex items-center ${
-                  index < mockReservationData.reservationSteps.length - 1
-                    ? "flex-1"
-                    : ""
+                  index < reservationSteps.length - 1 ? "flex-1" : ""
                 }`}
               >
                 <div
@@ -119,7 +212,7 @@ export default function ReservationPage() {
                 >
                   {step.id}
                 </div>
-                {index < mockReservationData.reservationSteps.length - 1 && (
+                {index < reservationSteps.length - 1 && (
                   <div
                     className={`flex-1 h-1 mx-2 ${
                       currentStep > step.id ? "bg-violet-600" : "bg-gray-200"
@@ -130,7 +223,7 @@ export default function ReservationPage() {
             ))}
           </div>
           <div className="flex justify-between mt-2">
-            {mockReservationData.reservationSteps.map((step) => (
+            {reservationSteps.map((step) => (
               <div
                 key={step.id}
                 className={`text-sm ${

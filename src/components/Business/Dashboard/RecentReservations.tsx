@@ -4,34 +4,47 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Clock, User, Phone, MapPin } from "lucide-react";
 import { reservationApi } from "@/api/business";
-import { Reservation } from "@/types/api";
+import { Reservation, ReservationStatus } from "@/types/api";
 
-// API 응답을 API 타입의 Reservation으로 변환하는 함수
-const convertToApiReservation = (reservation: any): Reservation => {
+// 확장된 예약 정보 타입 정의
+interface ReservationWithDetails extends Reservation {
+  customer_name?: string;
+  customer_phone?: string;
+  service_name?: string;
+  reservation_date?: string;
+  memo?: string;
+}
+
+// API 응답을 확장된 Reservation으로 변환하는 함수
+const convertToApiReservation = (reservation: any): ReservationWithDetails => {
   return {
     reservation_id: reservation.reservation_id,
-    customer_id: reservation.customer_id || reservation.user_id,
+    user_id: reservation.user_id || reservation.customer_id || "",
+    business_id: reservation.business_id || "",
+    pet_id: reservation.pet_id,
+    service_id: reservation.service_id,
+    start_time: reservation.start_time || "00:00",
+    end_time: reservation.end_time || "00:00",
+    status: reservation.status || ReservationStatus.PENDING,
+    price: reservation.price || 0,
+    notes: reservation.notes || "",
+    is_available: reservation.is_available ?? true,
+    created_at: reservation.created_at || new Date().toISOString(),
+    updated_at: reservation.updated_at || new Date().toISOString(),
+    // 확장 필드
     customer_name: reservation.customer_name || "고객",
     customer_phone: reservation.customer_phone || "연락처 정보 없음",
-    pet_id: reservation.pet_id,
-    pet_name: reservation.pet_name || "반려동물",
-    pet_type: reservation.pet_type || "종류 정보 없음",
-    service_id: reservation.service_id,
     service_name: reservation.service_name || "서비스",
     reservation_date:
       reservation.reservation_date || new Date().toISOString().split("T")[0],
-    start_time: reservation.start_time || "00:00",
-    end_time: reservation.end_time || "00:00",
-    status: reservation.status,
-    price: reservation.price || 0,
     memo: reservation.memo || reservation.notes || "",
-    created_at: reservation.created_at,
-    updated_at: reservation.updated_at,
   };
 };
 
 export default function RecentReservations() {
-  const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [reservations, setReservations] = useState<ReservationWithDetails[]>(
+    []
+  );
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -44,7 +57,7 @@ export default function RecentReservations() {
           sort_order: "desc",
         });
         const data = Array.isArray(response.data) ? response.data : [];
-        // API 응답을 API 타입의 Reservation으로 변환
+        // API 응답을 확장된 Reservation으로 변환
         const convertedReservations = data.map(convertToApiReservation);
         setReservations(convertedReservations);
       } catch (error) {
@@ -143,20 +156,20 @@ export default function RecentReservations() {
                 <td className="py-4">
                   <span
                     className={`px-2 py-1 text-sm rounded-full ${
-                      reservation.status === "completed"
+                      reservation.status === ReservationStatus.COMPLETED
                         ? "bg-green-100 text-green-600"
-                        : reservation.status === "cancelled"
+                        : reservation.status === ReservationStatus.CANCELED
                         ? "bg-red-100 text-red-600"
-                        : reservation.status === "pending"
+                        : reservation.status === ReservationStatus.PENDING
                         ? "bg-yellow-100 text-yellow-600"
                         : "bg-blue-100 text-blue-600"
                     }`}
                   >
-                    {reservation.status === "completed"
+                    {reservation.status === ReservationStatus.COMPLETED
                       ? "완료"
-                      : reservation.status === "cancelled"
+                      : reservation.status === ReservationStatus.CANCELED
                       ? "취소"
-                      : reservation.status === "pending"
+                      : reservation.status === ReservationStatus.PENDING
                       ? "대기"
                       : "확정"}
                   </span>
