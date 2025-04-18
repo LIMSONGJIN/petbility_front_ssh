@@ -9,7 +9,7 @@ export default function Home() {
   return (
     <>
       <Header />
-      <div className="pt-[68px] h-full flex flex-col gap-8 pb-20">
+      <div className="pt-[68px] h-full flex flex-col gap-8 md:gap-72 pb-20">
         <HeroSection />
         <ServiceList />
         <MemorialSection />

@@ -169,7 +169,7 @@ const categoryDetails = {
         title: "장례/화장 전용 차량",
         description:
           "엄숙한 분위기와 기능성을 모두 고려한 장례용 맞춤 차량. 이동 중에도 반려동물의 마지막 여정을 존중합니다.",
-        image: "https://placehold.co/300x300",
+        image: "/services/custom_vehicles/custom_vehicles1.svg",
       },
       {
         title: "미용/목욕 전용 차량",
@@ -244,7 +244,6 @@ export default function ServiceCategoryPage() {
       try {
         setLoading(true);
         const servicesData = await serviceApi.getAllServices();
-        // 현재 카테고리에 맞는 서비스만 필터링
         const filteredServices = servicesData.filter(
           (service) => service.category === categoryKey
         );
@@ -262,7 +261,6 @@ export default function ServiceCategoryPage() {
     }
   }, [categoryKey]);
 
-  // 카테고리가 유효하지 않은 경우
   if (!categoryInfo) {
     return (
       <div className="text-center py-20">
@@ -279,27 +277,27 @@ export default function ServiceCategoryPage() {
     );
   }
 
-  // 로딩 중인 경우
   if (loading) {
     return (
       <div className="container mx-auto px-6 py-8">
-        <div className="text-center">
-          <div className="h-8 bg-gray-200 rounded w-1/3 mx-auto mb-4 animate-pulse"></div>
-          <div className="h-4 bg-gray-200 rounded w-2/3 mx-auto animate-pulse"></div>
-        </div>
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
-          {[...Array(6)].map((_, index) => (
-            <div
-              key={index}
-              className="w-full max-w-[290px] h-80 bg-gray-200 rounded-xl animate-pulse"
-            ></div>
-          ))}
+        <div className="flex gap-8">
+          <div className="grid grid-cols-3 gap-4 w-2/3">
+            {[...Array(6)].map((_, index) => (
+              <div
+                key={index}
+                className="w-full aspect-square bg-gray-200 rounded-xl animate-pulse"
+              ></div>
+            ))}
+          </div>
+          <div className="w-1/3">
+            <div className="h-8 bg-gray-200 rounded w-2/3 mb-4 animate-pulse"></div>
+            <div className="h-4 bg-gray-200 rounded w-full animate-pulse"></div>
+          </div>
         </div>
       </div>
     );
   }
 
-  // 현재 카테고리의 서비스가 없는 경우
   if (services.length === 0) {
     return (
       <div className="text-center py-20">
@@ -323,77 +321,68 @@ export default function ServiceCategoryPage() {
     );
   }
 
-  // 대표 서비스 (첫 번째 서비스 사용)
   const service = services[0];
 
   return (
-    <>
-      <section className="container mx-auto px-6 py-8">
-        <div className="text-center max-w-3xl mx-auto">
-          <h1 className="text-3xl md:text-4xl font-extrabold text-gray-800 mb-4">
-            {service.name}
-          </h1>
-          <p className="text-base md:text-lg text-gray-600">
-            {service.description}
-          </p>
-        </div>
-
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
+    <div className=" md:py-12 w-full">
+      <div className="flex flex-col md:flex-row justify-center items-center gap-12 lg:gap-24">
+        {/* 왼쪽: 이미지 그리드 */}
+        <div className="w-full md:w-[50%] grid grid-cols-2 lg:grid-cols-3 gap-3">
           {categoryInfo.items.map((item, index) => (
             <div
               key={index}
-              className="rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition duration-300 group max-w-[290px]"
+              className="relative aspect-square rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300"
             >
-              <div className="relative w-full h-56">
-                <Image
-                  src={item.image}
-                  alt={item.title}
-                  fill
-                  className="object-cover scale-105 transition-transform duration-300"
-                />
-              </div>
-              <div className="bg-white p-5 h-fit flex flex-col justify-between">
-                <h3 className="text-xl font-semibold text-gray-800">
-                  {item.title}
-                </h3>
-                <p className="text-sm text-gray-500 mt-2">{item.description}</p>
+              <Image
+                src={item.image}
+                alt={item.title}
+                fill
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-black/5 transition-opacity duration-300">
+                <div className="absolute bottom-0 left-0 right-0 p-3">
+                  <h3 className="text-xs md:text-sm font-medium text-white">
+                    {item.title}
+                  </h3>
+                  <p className="text-xs text-white/80 mt-1">
+                    {item.description}
+                  </p>
+                </div>
               </div>
             </div>
           ))}
         </div>
 
-        <div className="mt-16 bg-gradient-to-br from-violet-100 via-white to-violet-50 border border-violet-200 p-8 rounded-xl text-center shadow-md">
-          <p className="text-lg md:text-xl font-semibold text-violet-800 leading-relaxed">
-            {categoryInfo.tagline}
-          </p>
-        </div>
+        {/* 오른쪽: 설명 텍스트 */}
+        <div className="w-full md:w-[35%] space-y-8">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-extrabold mb-4 font-hakgyo text-violet-500">
+              {service.name}
+            </h1>
+            <p className="text-lg md:text-xl text-gray-600 mb-6 font-semibold">
+              {service.description}
+            </p>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              {categoryInfo.tagline}
+            </p>
+          </div>
 
-        <div className="mt-16 bg-white border border-gray-200 rounded-xl p-8 shadow-sm text-center">
-          <h2 className="text-2xl font-bold text-gray-800 mb-3">
-            가격이 궁금하신가요?
-          </h2>
-          <p className="text-gray-600 mb-6">
-            서비스에 따라 가격이 상이할 수 있습니다. 정확한 견적은 예약 요청
-            또는 전화 문의를 통해 확인해주세요.
-          </p>
-
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+          <div className="flex gap-4">
             <Link
               href={`/reservation/${service.service_id}`}
-              className="bg-violet-600 hover:bg-violet-700 text-white font-semibold px-6 py-3 rounded-lg transition"
+              className="flex-1 bg-violet-600 hover:bg-violet-700 text-white text-center flex items-center justify-center rounded-full transition-colors duration-300 h-10"
             >
               예약하러 가기
             </Link>
-
             <a
               href="tel:1800-1234"
-              className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium px-5 py-3 rounded-lg transition"
+              className="flex-1 flex items-center justify-center gap-2 border border-gray-300 text-gray-700 py-3 rounded-full hover:bg-gray-50 transition-colors duration-300 h-10"
             >
               <PhoneCall className="w-5 h-5" /> 전화 문의
             </a>
           </div>
         </div>
-      </section>
-    </>
+      </div>
+    </div>
   );
 }

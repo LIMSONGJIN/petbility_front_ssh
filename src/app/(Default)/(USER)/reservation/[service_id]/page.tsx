@@ -165,6 +165,7 @@ export default function ReservationPage() {
             selectedDate={reservationData.date!}
             selectedTime={reservationData.time}
             selectedPetId={reservationData.petId}
+            businessId={reservationData.business_id}
             businessName={reservationData.business_name}
           />
         );

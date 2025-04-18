@@ -13,17 +13,18 @@ export default function HeroSection() {
           alt="반려동물과 함께하는 순간"
           fill
           className="opacity-40 object-cover"
+          priority
         />
       </div>
       <div className="relative z-10 text-center px-6">
         <motion.h1
-          className="text-4xl md:text-5xl font-bold leading-tight text-gray-800"
+          className="text-4xl md:text-5xl leading-tight text-gray-800 font-hakgyo-regular"
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
         >
           반려동물을 위한 <br /> 특별한 공간,{" "}
-          <span className="text-violet-600">펫빌리티</span>
+          <span className="text-violet-600 font-hakgyo">펫빌리티</span>
         </motion.h1>
         <motion.p
           className="mt-4 text-lg md:text-xl text-gray-700"
@@ -42,12 +43,12 @@ export default function HeroSection() {
           transition={{ duration: 0.5, delay: 0.5 }}
         >
           <Link href="/service">
-            <button className="px-6 py-3 bg-violet-600 text-white text-lg font-semibold rounded-lg shadow-lg hover:bg-violet-700 transition">
+            <button className="px-6 py-3 bg-violet-600 text-white text-lg font-semibold rounded-full shadow-lg hover:bg-violet-700 transition">
               서비스 예약하기
             </button>
           </Link>
           <Link href="/community">
-            <button className="px-6 py-3 bg-white text-violet-600 border border-violet-600 text-lg font-semibold rounded-lg shadow-lg hover:bg-violet-100 transition">
+            <button className="px-6 py-3 bg-white text-violet-600 border border-violet-600 text-lg font-semibold rounded-full shadow-lg hover:bg-violet-100 transition">
               추모 공간 둘러보기
             </button>
           </Link>

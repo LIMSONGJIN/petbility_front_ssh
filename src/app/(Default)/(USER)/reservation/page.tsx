@@ -5,8 +5,9 @@ import Link from "next/link";
 import { MapPin, Star, Heart, Filter } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
-import { businessAPI } from "@/services/api";
-import type { Service } from "@/types/api";
+import type { Service } from "@/types/business";
+import { ServiceCategory } from "@/types/api";
+import { serviceApi } from "@/api/business";
 
 const filterOptions = [
   { name: "가격 낮은 순", value: "price_asc" },
@@ -23,7 +24,7 @@ export default function ReservationList() {
   const { data: services, isLoading } = useQuery({
     queryKey: ["services"],
     queryFn: async () => {
-      const response = await businessAPI.getServices();
+      const response = await serviceApi.getServices();
       return response.data;
     },
   });

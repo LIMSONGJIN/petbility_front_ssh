@@ -118,7 +118,9 @@ export default function UserLayout({ children }: UserLayoutProps) {
         backgroundImage="/images/user-banner.jpg"
       />
       <Breadcrumb crumbs={breadcrumbs} />
-      <main className="container mx-auto px-4 py-8">{children}</main>
+      <main className="flex justify-center px-4 py-8 items-center h-full min-h-fit">
+        {children}
+      </main>
     </div>
   );
 }

@@ -34,10 +34,10 @@ export default function BestProductsSection() {
 
   return (
     <section className="container mx-auto py-12 px-8 w-full">
-      <h2 className="text-3xl font-bold text-gray-800 text-center mb-8">
+      <h2 className="text-3xl font-bold text-gray-800 text-center mb-2 font-hakgyo">
         쇼핑몰 베스트 상품
       </h2>
-      <p className="text-center text-gray-600 mb-12">
+      <p className="text-center text-gray-600 mb-8">
         많은 보호자들이 사랑하는 인기 상품들을 만나보세요.
       </p>
 

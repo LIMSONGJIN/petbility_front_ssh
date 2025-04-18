@@ -4,6 +4,11 @@ import { mockReservationData, services } from "@/data/service";
 import { ServiceCategory } from "@/types/api";
 import { serviceApi } from "@/api/service";
 import { toast } from "react-toastify";
+import { getTossPayments } from "@/lib/tossPayments";
+import { useRouter } from "next/navigation";
+import { useReservationStore } from "@/store/reservationStore";
+import { paymentApi } from "@/api/payment";
+import { loadTossPayments } from "@tosspayments/payment-sdk";
 
 interface PaymentStepProps {
   onNext: (notes: string) => void;
@@ -12,7 +17,9 @@ interface PaymentStepProps {
   selectedDate: Date;
   selectedTime: string;
   selectedPetId: string;
+  businessId: string;
   businessName: string;
+  reservationId?: string;
 }
 
 export default function PaymentStep({
@@ -22,12 +29,16 @@ export default function PaymentStep({
   selectedDate,
   selectedTime,
   selectedPetId,
+  businessId,
   businessName,
+  reservationId,
 }: PaymentStepProps) {
+  const router = useRouter();
   const [notes, setNotes] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [serviceDetails, setServiceDetails] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { setReservationData } = useReservationStore();
 
   // 서비스 정보 불러오기
   useEffect(() => {
@@ -102,11 +113,41 @@ export default function PaymentStep({
   };
 
   const handlePayment = async () => {
-    setIsProcessing(true);
-    // 실제 결제 로직은 여기에 구현
-    await new Promise((resolve) => setTimeout(resolve, 2000)); // 결제 처리 시뮬레이션
-    setIsProcessing(false);
-    onNext(notes);
+    try {
+      setIsLoading(true);
+
+      // 서비스 시작 시간 계산
+      const startDate = new Date(selectedDate);
+      const [hours, minutes] = selectedTime.split(":").map(Number);
+      startDate.setHours(hours, minutes);
+
+      // 결제 요청 API 호출
+      const paymentRequest = await paymentApi.requestPayment({
+        service_id: serviceType,
+        business_id: businessId,
+        amount: Number(servicePrice),
+        pet_id: selectedPetId,
+        start_time: startDate.toISOString(),
+        notes: notes,
+      });
+
+      // 토스페이먼츠 결제창 열기
+      const tossPayments = await getTossPayments();
+
+      await tossPayments.requestPayment("카드", {
+        amount: paymentRequest.amount,
+        orderId: paymentRequest.orderId,
+        orderName: getServiceName(serviceType),
+        customerName: paymentRequest.ordererName,
+        customerEmail: paymentRequest.ordererEmail,
+        successUrl: `${window.location.origin}/payments/success`,
+        failUrl: `${window.location.origin}/payments/fail`,
+      });
+    } catch (error) {
+      console.error("결제 요청 중 오류:", error);
+      toast.error("결제 처리 중 오류가 발생했습니다.");
+      setIsLoading(false);
+    }
   };
 
   const formatDate = (date: Date) => {

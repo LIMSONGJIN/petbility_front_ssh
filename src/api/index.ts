@@ -1,14 +1,6 @@
-// user API
+// 모든 API 모듈 내보내기
 export * from "./auth";
-
-// business API
-export * from "./business/business";
-
-// user reservation API
-export * from "./user/user";
-
-// admin API
-export * from "./admin/admin";
-
-// notification API
+export * from "./service";
 export * from "./notification";
+export * from "./business/business";
+export * from "./payment";

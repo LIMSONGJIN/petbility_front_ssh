@@ -43,7 +43,7 @@ const itemVariants = {
 export default function MemorialSection() {
   return (
     <section className="container mx-auto px-6">
-      <h2 className="text-3xl font-bold text-gray-800 text-center mb-2">
+      <h2 className="text-3xl font-bold text-gray-800 text-center mb-2 font-hakgyo">
         추모 공간
       </h2>
       <p className="text-center text-gray-600 mb-8">

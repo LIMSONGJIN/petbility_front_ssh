@@ -348,7 +348,7 @@ export const mockReservationData = {
   // 반려동물 목록
   pets: [
     {
-      id: "pet1",
+      id: "322db1b2-585e-4539-be94-ed31d8d3dc32",
       name: "루루",
       type: "강아지",
       breed: "골든 리트리버",
@@ -356,7 +356,7 @@ export const mockReservationData = {
       image: "https://placehold.co/300x300",
     },
     {
-      id: "pet2",
+      id: "322db1b2-585e-4539-be94-ed31d8d3dc31",
       name: "나비",
       type: "고양이",
       breed: "페르시안",

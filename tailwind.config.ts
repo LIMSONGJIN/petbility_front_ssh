@@ -43,6 +43,8 @@ export default {
       fontFamily: {
         sans: ["Noto Sans KR", "sans-serif"],
         serif: ["Merriweather", "serif"],
+        hakgyo: ["HakgyoansimDunggeunmisoTTF-B", "sans-serif"],
+        "hakgyo-regular": ["HakgyoansimDunggeunmisoTTF-R", "sans-serif"],
       },
       borderRadius: {
         lg: "var(--radius)",
