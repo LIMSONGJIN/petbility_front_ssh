@@ -2,7 +2,7 @@
 import { useEffect, useRef } from "react";
 import { io } from "socket.io-client";
 
-const SOCKET_URL = "http://localhost:4000"; // 서버 주소
+const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL; // 서버 주소
 
 export const useSocket = (
   userId: string,

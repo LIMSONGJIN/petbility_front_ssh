@@ -251,10 +251,46 @@ export const businessApi = {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(
-        errorData.message || "사용자 목록을 불러오는데 실패했습니다."
-      );
+      throw new Error("사용자 목록을 불러오는데 실패했습니다.");
+    }
+
+    return response.json();
+  },
+
+  // 특정 사용자 조회
+  getUser: async (userId: string): Promise<any> => {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("인증 토큰이 없습니다.");
+
+    const response = await fetch(`${API_URL}/business/users/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("사용자 정보를 불러오는데 실패했습니다.");
+    }
+
+    return response.json();
+  },
+
+  // 사용자 정보 업데이트
+  updateUser: async (userId: string, userData: any): Promise<any> => {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("인증 토큰이 없습니다.");
+
+    const response = await fetch(`${API_URL}/business/users/${userId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(userData),
+    });
+
+    if (!response.ok) {
+      throw new Error("사용자 정보 업데이트에 실패했습니다.");
     }
 
     return response.json();

@@ -28,6 +28,7 @@ export default function AuthProvider({
   useEffect(() => {
     const init = async () => {
       await initializeAuth();
+
       setIsInitialized(true);
     };
 
@@ -37,7 +38,9 @@ export default function AuthProvider({
   // 인증 상태에 따른 라우팅 처리
   useEffect(() => {
     // 초기화가 완료되지 않았으면 아무것도 하지 않음
-    if (!isInitialized || isAuthLoading || isUserLoading) return;
+    if (!isInitialized || isAuthLoading || isUserLoading) {
+      return;
+    }
 
     // 현재 경로가 보호된 경로인지 확인
     const isProtectedPath = protectedPaths.some((path) =>
@@ -51,15 +54,16 @@ export default function AuthProvider({
 
     // 인증되지 않았고 보호된 경로인 경우 로그인 페이지로 리다이렉트
     if (!isAuthenticated) {
-      router.replace(`/auth/signin?redirectTo=${pathname}`);
+      router.push(`/auth/signin?redirectTo=${pathname}`);
       return;
     }
 
     // 인증되었고 사용자 정보가 있는 경우 역할에 따른 라우팅
     if (isAuthenticated && user) {
+      console.log("AuthProvider: 사용자 역할:", user.role);
+
       if (pathname.startsWith("/admin") && user.role !== UserRole.ADMIN) {
-        // 관리자가 아니면 admin 접근 불가
-        router.replace(user.role === UserRole.BUSINESS ? "/business" : "/");
+        router.push(user.role === UserRole.BUSINESS ? "/business" : "/");
         return;
       }
 
@@ -68,8 +72,7 @@ export default function AuthProvider({
         user.role !== UserRole.ADMIN &&
         user.role !== UserRole.BUSINESS
       ) {
-        // 관리자나 비즈니스 사용자가 아니면 business 접근 불가
-        router.replace("/");
+        router.push("/");
         return;
       }
     }

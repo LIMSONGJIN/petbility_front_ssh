@@ -12,7 +12,7 @@ export default function HeroSection() {
           src="/hero-bg2.svg" // 실제 이미지 경로 확인
           alt="반려동물과 함께하는 순간"
           fill
-          className="opacity-40 object-cover"
+          className="object-cover"
           priority
         />
       </div>

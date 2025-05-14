@@ -112,7 +112,7 @@ export default function Header() {
       <div className="container mx-auto flex justify-between gap-0 md:gap-4 lg:gap-32 xl:justify-between items-center py-4 px-6 z-20">
         {/* Logo */}
         <Link href="/" className="text-2xl font-bold text-gray-800">
-          <Image src="/animal.png" alt="로고" width={36} height={36} />
+          <Image src="/logo.svg" alt="로고" width={36} height={36} />
         </Link>
 
         {/* Desktop Menu */}

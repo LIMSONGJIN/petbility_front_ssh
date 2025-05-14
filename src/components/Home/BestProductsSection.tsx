@@ -83,7 +83,7 @@ export default function BestProductsSection() {
                   <span className="ml-1">{product.like}</span>
                 </span>
                 <Link
-                  href={`/shop/${product.product_id}`}
+                  href={`/shopping/${product.product_id}`}
                   className="px-4 py-2 bg-violet-600 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-violet-700 transition"
                 >
                   상품 보기

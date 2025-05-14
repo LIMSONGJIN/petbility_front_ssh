@@ -3,12 +3,12 @@ import Link from "next/link";
 
 const footerLinks = [
   {
-    href: "/services",
+    href: "/service",
     name: "서비스 소개",
   },
   { name: "서비스 예약", href: "/reservations" },
   { name: "추모 공간", href: "/community" },
-  { name: "용품샵", href: "/shop" },
+  { name: "용품샵", href: "/shopping" },
 ];
 
 const footerLinks2 = [

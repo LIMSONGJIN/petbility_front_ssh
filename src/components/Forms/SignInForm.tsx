@@ -35,11 +35,22 @@ const SignInForm = () => {
       const { data } = await supabase.auth.getSession();
 
       if (data?.session?.access_token) {
-        localStorage.setItem("token", data.session.access_token); // ✅ 저장
+        console.log(
+          "액세스 토큰 저장:",
+          data.session.access_token.substring(0, 10) + "..."
+        );
+        localStorage.setItem("token", data.session.access_token);
+
+        // 쿠키에도 토큰 저장 시도 (백업)
+        document.cookie = `supabase-auth-token=${data.session.access_token}; path=/; max-age=86400`;
+      } else {
+        console.log("세션에 액세스 토큰이 없음");
       }
 
       router.push("/auth/callback/client");
       await fetchSession();
+    } else {
+      console.log("로그인 실패:", result?.message);
     }
 
     return result;

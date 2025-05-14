@@ -11,7 +11,7 @@ import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { Customer } from "@/types/business";
 import { toast } from "sonner";
-import { businessUserApi } from "@/api/business/business";
+import { businessApi } from "@/api/business/business";
 
 export default function UserDetailPage() {
   const params = useParams();
@@ -25,11 +25,11 @@ export default function UserDetailPage() {
     const fetchUser = async () => {
       setIsLoading(true);
       try {
-        const response = await businessUserApi.getUser(params.id as string);
-        setUser(response);
-        setEditedUser(response);
+        const data = await businessApi.getUser(params.id as string);
+        setUser(data);
+        setEditedUser(data);
       } catch (error) {
-        toast.error("사용자 정보를 불러오는데 실패했습니다.");
+        console.error("사용자 정보를 불러오는데 실패했습니다:", error);
       } finally {
         setIsLoading(false);
       }
@@ -40,11 +40,12 @@ export default function UserDetailPage() {
 
   const handleSave = async () => {
     try {
-      await businessUserApi.updateUser(params.id as string, editedUser);
+      await businessApi.updateUser(params.id as string, editedUser);
       setUser({ ...user, ...editedUser } as Customer);
       setIsEditing(false);
       toast.success("사용자 정보가 업데이트되었습니다.");
     } catch (error) {
+      console.error("사용자 정보 업데이트에 실패했습니다:", error);
       toast.error("사용자 정보 업데이트에 실패했습니다.");
     }
   };

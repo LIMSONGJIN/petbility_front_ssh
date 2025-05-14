@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { AnimatePresence } from "framer-motion";
 import BusinessSelectionStep from "@/components/Service/BusinessSelectionStep";
 import DateTimeStep from "@/components/Service/DateTimeStep";
@@ -13,6 +13,7 @@ import { userReservationApi } from "@/api/user/user";
 import { Business, ServiceWithBusiness } from "@/api/user/user";
 import { toast } from "react-toastify";
 import { CreateReservationData } from "@/types/api";
+import { useAuthStore } from "@/lib/zustand/useAuthStore";
 
 interface ReservationData {
   business_id: string;
@@ -25,6 +26,8 @@ interface ReservationData {
 
 export default function ReservationPage() {
   const { service_id } = useParams();
+  const router = useRouter();
+  const { isAuthenticated, isLoading: authLoading } = useAuthStore();
   const [currentStep, setCurrentStep] = useState(1);
   const [reservationData, setReservationData] = useState<ReservationData>({
     business_id: "",
@@ -41,8 +44,22 @@ export default function ReservationPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [serviceName, setServiceName] = useState("");
 
+  // 로그인 상태 확인
+  useEffect(() => {
+    // 인증 로딩이 완료되었고, 로그인되지 않은 경우
+    if (!authLoading && !isAuthenticated) {
+      // 현재 페이지 URL을 리다이렉트 파라미터로 포함
+      const redirectPath = encodeURIComponent(window.location.pathname);
+      router.push(`/auth/signin?redirectTo=${redirectPath}`);
+      toast.info("예약을 위해서는 로그인이 필요합니다.");
+    }
+  }, [authLoading, isAuthenticated, router]);
+
   // 서비스 상세 및 사업자 목록 불러오기
   useEffect(() => {
+    // 인증되지 않았으면 API 호출 중단
+    if (!isAuthenticated) return;
+
     const fetchBusinesses = async () => {
       try {
         setIsLoading(true);
@@ -73,7 +90,21 @@ export default function ReservationPage() {
     if (service_id) {
       fetchBusinesses();
     }
-  }, [service_id]);
+  }, [service_id, isAuthenticated]);
+
+  // 로그인 또는 데이터 로딩 중인 경우 로딩 표시
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-violet-500"></div>
+      </div>
+    );
+  }
+
+  // 인증되지 않은 경우 빈 컴포넌트 반환 (리다이렉트 처리됨)
+  if (!isAuthenticated) {
+    return null;
+  }
 
   const handleBusinessSelect = (businessId: string, businessName: string) => {
     setReservationData((prev) => ({
