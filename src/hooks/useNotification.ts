@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useSocket } from "@/lib/useSocket";
 import { Notification } from "@/types/api";
-import { notificationApi } from "@/api";
+import { notificationApi } from "@/app/api";
 
 export function useNotification() {
   const [notifications, setNotifications] = useState<Notification[]>([]);

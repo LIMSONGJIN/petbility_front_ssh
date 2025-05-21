@@ -13,16 +13,24 @@ import { Label } from "../ui/label";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Image from "next/image";
-import { useSessionStore } from "@/lib/zustand/useSessionStore";
+import { useAuthStore } from "@/lib/zustand/useAuthStore";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
+import { useUser } from "@/hooks/useUser";
+import { UserRole } from "@/types/api";
 
-const SignInForm = () => {
+interface SignInFormProps {
+  redirectTo?: string;
+}
+
+const SignInForm = ({ redirectTo = "/" }: SignInFormProps) => {
   const router = useRouter();
-  const { fetchSession } = useSessionStore();
+  const { initializeAuth, setAuthToken } = useAuthStore();
+  const { refetch: refetchUser } = useUser();
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [email, setEmail] = useState("");
+  const [isProcessingLogin, setIsProcessingLogin] = useState(false);
 
   const [error, formAction, isPending] = useActionState<
     { message?: string; success?: boolean }, // 반환 타입
@@ -31,6 +39,7 @@ const SignInForm = () => {
     const result = await signinWithEmailPassword(null, formData);
 
     if (result?.success) {
+      setIsProcessingLogin(true);
       const supabase = createClient();
       const { data } = await supabase.auth.getSession();
 
@@ -39,16 +48,30 @@ const SignInForm = () => {
           "액세스 토큰 저장:",
           data.session.access_token.substring(0, 10) + "..."
         );
-        localStorage.setItem("token", data.session.access_token);
+        // 토큰 상태 관리 통합
+        setAuthToken(data.session.access_token);
 
-        // 쿠키에도 토큰 저장 시도 (백업)
-        document.cookie = `supabase-auth-token=${data.session.access_token}; path=/; max-age=86400`;
+        try {
+          // 세션 초기화 (fetchSession 대신 initializeAuth 사용)
+          await initializeAuth();
+
+          // 사용자 정보 갱신
+          await refetchUser();
+
+          // 로그인 성공 후 역할 확인을 위해 콜백 페이지로 리다이렉션
+          // 콜백 페이지에서 더 정확하게 역할 기반 라우팅 처리
+          console.log("로그인 성공: 콜백 페이지로 이동");
+          router.push(`/auth/callback/client?redirectTo=${redirectTo}`);
+        } catch (err) {
+          console.error("로그인 후 데이터 초기화 오류:", err);
+          router.push("/auth/callback/client");
+        } finally {
+          setIsProcessingLogin(false);
+        }
       } else {
         console.log("세션에 액세스 토큰이 없음");
+        router.push("/auth/callback/client");
       }
-
-      router.push("/auth/callback/client");
-      await fetchSession();
     } else {
       console.log("로그인 실패:", result?.message);
     }
@@ -163,8 +186,11 @@ const SignInForm = () => {
           </Link>
         </div>
 
-        <button disabled={isPending} className="sign-btn w-full">
-          {isPending ? "로그인 중..." : "로그인"}
+        <button
+          disabled={isPending || isProcessingLogin}
+          className="sign-btn w-full"
+        >
+          {isPending || isProcessingLogin ? "로그인 중..." : "로그인"}
         </button>
       </form>
 

@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import Calendar from "@/components/ClientCalender";
-import { userReservationApi } from "@/api/user/user";
+import { userReservationApi } from "@/app/api/user/user";
 import {
   format,
   parse,
@@ -17,7 +17,7 @@ import {
   DayAvailability,
   MonthlySchedule,
   DailySchedule,
-} from "@/api/user/user";
+} from "@/app/api/user/user";
 
 // 날짜의 요일 번호 변환 (0=월요일, 1=화요일, ... 6=일요일)
 const getAdjustedDayNumber = (date: Date): number => {

@@ -4,7 +4,7 @@ import { ChevronRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Service, serviceApi } from "@/api/service";
+import { Service, serviceApi } from "@/app/api/service";
 import { toast } from "sonner";
 import { ServiceCategory } from "@/types/api";
 import Slider from "react-slick";

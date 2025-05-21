@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Clock, User, Phone, MapPin } from "lucide-react";
-import { reservationApi } from "@/api/business";
+import { reservationApi } from "@/app/api/business";
 import { Reservation, ReservationStatus } from "@/types/api";
 
 // 확장된 예약 정보 타입 정의

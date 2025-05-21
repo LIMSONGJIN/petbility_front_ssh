@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { SERVICE_CATEGORIES } from "@/constants/service";
 import { ServiceCard } from "@/components/Business/Service/ServiceCard";
 import { toast } from "sonner";
-import { Service, serviceApi } from "@/api/service";
-import { businessServiceApi } from "@/api/business/business";
+import { Service, serviceApi } from "@/app/api/service";
+import { businessServiceApi } from "@/app/api/business/business";
 import { ServiceCategory } from "@/types/api";
 
 // 카테고리 ID 매핑 (API 응답의 category 값과 SERVICE_CATEGORIES의 id 값 매핑)
@@ -35,7 +35,20 @@ export default function BusinessServiceListPage() {
       // API를 사용하여 서비스 목록 가져오기
       const servicesData = await serviceApi.getAllServices();
       console.log("서비스 목록:", servicesData);
-      setServices(servicesData);
+
+      // 로컬 스토리지에서 서비스 상태 확인하여 반영
+      const updatedServices = servicesData.map((service) => {
+        const localStatus = businessServiceApi.getServiceStatus(
+          service.service_id
+        );
+        // 로컬 스토리지에 저장된 상태가 있으면 그 값을 우선 사용
+        if (localStatus) {
+          return { ...service, status: localStatus };
+        }
+        return service;
+      });
+
+      setServices(updatedServices);
     } catch (error) {
       console.error("서비스 목록 조회 실패:", error);
       setError("서비스 목록을 불러오는데 실패했습니다. 다시 시도해주세요.");
@@ -75,6 +88,10 @@ export default function BusinessServiceListPage() {
             : service
         )
       );
+
+      // 로컬 스토리지에 상태 저장 (페이지 이동 후에도 유지)
+      const storageKey = `service_status_${serviceId}`;
+      localStorage.setItem(storageKey, newStatus);
 
       toast.success(
         newStatus === "active"
@@ -149,21 +166,35 @@ export default function BusinessServiceListPage() {
               const mappedCategory = CATEGORY_MAPPING[s.category] || s.category;
               return mappedCategory === category.id;
             });
-            const isActive = service?.status === "active";
+
+            // 서비스가 있는 경우 상태 확인, 없는 경우 로컬 스토리지 확인
+            let isActive = false;
+            if (service) {
+              isActive = service.status === "active";
+            } else {
+              // 서비스 ID를 추정하여 로컬 스토리지 확인
+              const estimatedServiceId = `svc-${category.id}`;
+              const localStatus =
+                businessServiceApi.getServiceStatus(estimatedServiceId);
+              isActive = localStatus === "active";
+            }
 
             return (
               <ServiceCard
                 key={category.id}
                 category={category}
                 isActive={isActive}
-                serviceId={service?.service_id}
-                onToggle={() =>
-                  service &&
-                  !(updatingServiceId === service.service_id) &&
-                  handleServiceToggle(
-                    service.service_id,
-                    service.status || "inactive"
-                  )
+                serviceId={service?.service_id || `svc-${category.id}`}
+                onToggle={() => {
+                  const svcId = service?.service_id || `svc-${category.id}`;
+                  const currentStatus = isActive ? "active" : "inactive";
+                  if (!(updatingServiceId === svcId)) {
+                    handleServiceToggle(svcId, currentStatus);
+                  }
+                }}
+                isUpdating={
+                  updatingServiceId ===
+                  (service?.service_id || `svc-${category.id}`)
                 }
               />
             );

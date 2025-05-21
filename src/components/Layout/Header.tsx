@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { createClient } from "@/utils/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
-import { useSessionStore } from "@/lib/zustand/useSessionStore";
 import { usePathname } from "next/navigation";
+import { useAuthStore } from "@/lib/zustand/useAuthStore";
 
 const navLinks = [
   {
@@ -57,13 +57,11 @@ export default function Header() {
   const menuRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
 
-  const { session } = useSessionStore();
+  const { session, signOut } = useAuthStore();
 
   // 로그아웃 처리
   const handleSignOut = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    localStorage.removeItem("token");
+    await signOut();
   };
 
   // 프로필 드롭다운 외부 클릭 감지

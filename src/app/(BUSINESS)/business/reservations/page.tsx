@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Reservation, ReservationStatus } from "@/types/api";
-import { businessReservationApi } from "@/api/business/business";
-import { userApi } from "@/api/auth";
+import { businessReservationApi } from "@/app/api/business/business";
+import { userApi } from "@/app/api/auth";
 import { ReservationList } from "@/components/Business/Reservation/ReservationList";
 import BusinessSchedule from "@/components/Business/Reservation/BusinessSchedule";
 import { Button } from "@/components/ui/button";

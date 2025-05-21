@@ -2,10 +2,10 @@
 
 import { Settings, LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useSessionStore } from "@/lib/zustand/useSessionStore";
 import Image from "next/image";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/lib/zustand/useAuthStore";
 
 const menuItems = [
   { title: "대시보드", href: "/business/dashboard" },
@@ -22,15 +22,12 @@ interface HeaderProps {
 }
 
 export default function Header({ pathname }: HeaderProps) {
-  const { session } = useSessionStore();
+  const { session, signOut } = useAuthStore();
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   const handleSignOut = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    localStorage.removeItem("token");
-    router.push("/");
+    await signOut();
   };
 
   useEffect(() => {

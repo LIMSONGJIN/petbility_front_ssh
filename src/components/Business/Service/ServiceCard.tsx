@@ -1,13 +1,14 @@
 import { ServiceCategory } from "@/constants/service";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Circle } from "lucide-react";
+import { CheckCircle2, Circle, Loader2 } from "lucide-react";
 
 interface ServiceCardProps {
   category: ServiceCategory;
   isActive: boolean;
   serviceId?: string;
   onToggle: () => void;
+  isUpdating?: boolean;
 }
 
 export function ServiceCard({
@@ -15,6 +16,7 @@ export function ServiceCard({
   isActive,
   serviceId,
   onToggle,
+  isUpdating = false,
 }: ServiceCardProps) {
   return (
     <Card
@@ -27,7 +29,9 @@ export function ServiceCard({
           isActive ? "bg-violet-500" : "bg-gray-200"
         }`}
       >
-        {isActive ? (
+        {isUpdating ? (
+          <Loader2 className="w-5 h-5 text-white animate-spin" />
+        ) : isActive ? (
           <CheckCircle2 className="w-5 h-5 text-white" />
         ) : (
           <Circle className="w-5 h-5 text-white" />
@@ -48,7 +52,11 @@ export function ServiceCard({
               isActive ? "text-violet-600" : "text-gray-500"
             }`}
           >
-            {isActive ? "운영 중" : "운영하지 않음"}
+            {isUpdating
+              ? "업데이트 중..."
+              : isActive
+              ? "운영 중"
+              : "운영하지 않음"}
           </span>
           <Button
             variant="outline"
@@ -59,8 +67,11 @@ export function ServiceCard({
                 ? "text-red-500 hover:text-red-600"
                 : "text-violet-500 hover:text-violet-600"
             }
-            disabled={!serviceId}
+            disabled={!serviceId || isUpdating}
           >
+            {isUpdating ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : null}
             {isActive ? "운영 중지" : "운영 시작"}
           </Button>
         </div>

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { MapPin, Phone } from "lucide-react";
-import { Business, ServiceWithBusiness } from "@/api/user/user";
+import { Business, ServiceWithBusiness } from "@/app/api/user/user";
 
 interface BusinessSelectionStepProps {
   serviceBusinesses: ServiceWithBusiness[];

@@ -11,7 +11,7 @@ import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { Customer } from "@/types/business";
 import { toast } from "sonner";
-import { businessApi } from "@/api/business/business";
+import { businessApi } from "@/app/api/business/business";
 
 export default function UserDetailPage() {
   const params = useParams();

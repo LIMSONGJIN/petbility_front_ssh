@@ -10,7 +10,7 @@ import {
   Clock,
   Star,
 } from "lucide-react";
-import { statsApi } from "@/api/business";
+import { statsApi } from "@/app/api/business";
 import { BusinessStats } from "@/types/business";
 
 export default function DashboardStats() {

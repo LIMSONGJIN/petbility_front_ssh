@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import type { Service } from "@/types/business";
 import { ServiceCategory } from "@/types/api";
-import { serviceApi } from "@/api/business";
+import { serviceApi } from "@/app/api/business";
 
 const filterOptions = [
   { name: "가격 낮은 순", value: "price_asc" },

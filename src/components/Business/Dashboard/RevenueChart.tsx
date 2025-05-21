@@ -13,7 +13,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { salesApi } from "@/api/business";
+import { salesApi } from "@/app/api/business";
 import { SalesData } from "@/types/business";
 
 ChartJS.register(

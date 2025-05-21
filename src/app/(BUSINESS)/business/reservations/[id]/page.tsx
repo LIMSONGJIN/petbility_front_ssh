@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Reservation, ReservationStatus } from "@/types/api";
-import { businessReservationApi } from "@/api/business/business";
+import { businessReservationApi } from "@/app/api/business/business";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { motion } from "framer-motion";

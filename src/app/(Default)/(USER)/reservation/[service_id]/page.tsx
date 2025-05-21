@@ -9,8 +9,8 @@ import PetSelectionStep from "@/components/Service/PetSelectionStep";
 import PaymentStep from "@/components/Service/PaymentStep";
 import CompletionStep from "@/components/Service/CompletionStep";
 import { mockReservationData } from "@/data/service";
-import { userReservationApi } from "@/api/user/user";
-import { Business, ServiceWithBusiness } from "@/api/user/user";
+import { userReservationApi } from "@/app/api/user/user";
+import { Business, ServiceWithBusiness } from "@/app/api/user/user";
 import { toast } from "react-toastify";
 import { CreateReservationData } from "@/types/api";
 import { useAuthStore } from "@/lib/zustand/useAuthStore";
@@ -226,45 +226,47 @@ export default function ReservationPage() {
         )}
 
         {/* 진행 단계 표시 */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            {reservationSteps.map((step, index) => (
-              <div
-                key={step.id}
-                className={`flex items-center ${
-                  index < reservationSteps.length - 1 ? "flex-1" : ""
-                }`}
-              >
+        <div className="mb-12 px-6">
+          {/* 그리드 레이아웃으로 변경 */}
+          <div className="grid grid-cols-5 gap-10 relative">
+            {/* 배경 연결선 */}
+            <div className="absolute top-5 left-12 right-12 h-1 bg-gray-200"></div>
+
+            {/* 활성화된 연결선 */}
+            <div
+              className="absolute top-5 left-12 h-1 bg-violet-600 transition-all duration-300"
+              style={{
+                width: `${
+                  ((currentStep - 1) / (reservationSteps.length - 1)) *
+                  (100 - 24)
+                }%`,
+              }}
+            ></div>
+
+            {/* 각 단계 (원 + 텍스트) */}
+            {reservationSteps.map((step) => (
+              <div key={step.id} className="flex flex-col items-center">
+                {/* 숫자 원 */}
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                  className={`w-10 h-10 rounded-full flex items-center justify-center shadow-sm mb-4 z-10 ${
                     currentStep >= step.id
                       ? "bg-violet-600 text-white"
                       : "bg-gray-200 text-gray-600"
                   }`}
                 >
-                  {step.id}
+                  <span className="font-medium">{step.id}</span>
                 </div>
-                {index < reservationSteps.length - 1 && (
-                  <div
-                    className={`flex-1 h-1 mx-2 ${
-                      currentStep > step.id ? "bg-violet-600" : "bg-gray-200"
-                    }`}
-                  />
-                )}
-              </div>
-            ))}
-          </div>
-          <div className="flex justify-between mt-2">
-            {reservationSteps.map((step) => (
-              <div
-                key={step.id}
-                className={`text-sm ${
-                  currentStep >= step.id
-                    ? "text-violet-600 font-medium"
-                    : "text-gray-500"
-                }`}
-              >
-                {step.title}
+
+                {/* 텍스트 */}
+                <div
+                  className={`text-xs text-center mx-auto w-16 ${
+                    currentStep >= step.id
+                      ? "text-violet-600 font-medium"
+                      : "text-gray-500"
+                  }`}
+                >
+                  {step.title}
+                </div>
               </div>
             ))}
           </div>

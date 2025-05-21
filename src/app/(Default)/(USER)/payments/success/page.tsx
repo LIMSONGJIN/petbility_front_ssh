@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { paymentApi } from "@/api/payment";
+import { paymentApi } from "@/app/api/payment";
 import { toast } from "react-toastify";
 import Link from "next/link";
 

@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { PhoneCall } from "lucide-react";
 import { ServiceCategory } from "@/types/api";
-import { Service, serviceApi } from "@/api/service";
+import { Service, serviceApi } from "@/app/api/service";
 import { toast } from "sonner";
 
 // 서비스 카테고리별 추가 정보 (API에서 가져오지 않는 정보)

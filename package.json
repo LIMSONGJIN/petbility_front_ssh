@@ -9,7 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@auth/supabase-adapter": "^1.8.0",
+    "@auth/core": "^0.39.1",
+    "@auth/supabase-adapter": "^1.9.1",
     "@emailjs/browser": "^4.4.1",
     "@nestjs/passport": "^11.0.5",
     "@prisma/client": "^6.4.1",
@@ -35,7 +36,7 @@
     "leaflet": "^1.9.4",
     "lucide-react": "^0.475.0",
     "next": "15.1.7",
-    "next-auth": "^4.24.11",
+    "next-auth": "^5.0.0-beta.28",
     "notiflix": "^3.2.8",
     "passport-google-oauth20": "^2.0.0",
     "passport-kakao": "^1.0.1",

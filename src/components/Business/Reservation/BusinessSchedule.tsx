@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Clock, CheckCircle2, AlertCircle } from "lucide-react";
-import { businessScheduleApi } from "@/api/business/business";
+import { businessScheduleApi } from "@/app/api/business/business";
 import { toast } from "sonner";
 import {
   BlockTimePayload,

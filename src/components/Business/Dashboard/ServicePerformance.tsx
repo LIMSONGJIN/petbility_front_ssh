@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { TrendingUp } from "lucide-react";
-import { serviceApi, reservationApi } from "@/api/business";
+import { serviceApi, reservationApi } from "@/app/api/business";
 import { Service, Reservation } from "@/types/business";
 import { dummyReservations } from "@/data/dummy/business";
 

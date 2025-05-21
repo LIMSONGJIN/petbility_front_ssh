@@ -30,7 +30,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { SalesData, SalesSummary } from "@/types/business";
-import { salesApi } from "@/api/business";
+import { salesApi } from "@/app/api/business";
 
 ChartJS.register(
   CategoryScale,

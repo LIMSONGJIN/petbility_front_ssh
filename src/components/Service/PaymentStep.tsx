@@ -2,12 +2,12 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { mockReservationData, services } from "@/data/service";
 import { ServiceCategory } from "@/types/api";
-import { serviceApi } from "@/api/service";
+import { serviceApi } from "@/app/api/service";
 import { toast } from "react-toastify";
 import { getTossPayments } from "@/lib/tossPayments";
 import { useRouter } from "next/navigation";
 import { useReservationStore } from "@/store/reservationStore";
-import { paymentApi } from "@/api/payment";
+import { paymentApi } from "@/app/api/payment";
 import { loadTossPayments } from "@tosspayments/payment-sdk";
 
 interface PaymentStepProps {

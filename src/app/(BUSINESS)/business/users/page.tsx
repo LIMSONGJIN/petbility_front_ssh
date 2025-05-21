@@ -9,7 +9,7 @@ import { Search, User, Phone, Calendar, MapPin } from "lucide-react";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { Customer } from "@/types/business";
-import { businessApi } from "@/api/business/business";
+import { businessApi } from "@/app/api/business/business";
 import { toast } from "react-toastify";
 
 export default function UserManagementPage() {
@@ -24,9 +24,11 @@ export default function UserManagementPage() {
       try {
         const data = await businessApi.getUsers();
         setUsers(data);
+        console.log("사용자 목록 로드 성공:", data.length, "명의 사용자");
       } catch (error) {
         console.error("Failed to fetch users:", error);
         toast.error("사용자 목록을 불러오는데 실패했습니다.");
+        setUsers([]);
       } finally {
         setIsLoading(false);
       }
@@ -91,6 +93,45 @@ export default function UserManagementPage() {
     );
   }
 
+  if (filteredUsers.length === 0) {
+    return (
+      <div className="max-w-6xl mx-auto p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold">사용자 관리</h1>
+          <div className="relative w-64">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              type="text"
+              placeholder="이름, 전화번호, 주소로 검색"
+              className="pl-10"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center justify-center p-12 bg-white rounded-lg shadow-sm">
+          <User className="w-16 h-16 text-gray-300 mb-4" />
+          <h2 className="text-xl font-semibold text-gray-700 mb-2">
+            사용자가 없습니다
+          </h2>
+          <p className="text-gray-500 text-center mb-6">
+            {searchQuery
+              ? "검색 조건에 맞는 사용자가 없습니다. 다른 검색어로 시도해보세요."
+              : "아직 등록된 사용자가 없습니다."}
+          </p>
+          <Button
+            onClick={() => setSearchQuery("")}
+            variant="outline"
+            className={searchQuery ? "block" : "hidden"}
+          >
+            모든 사용자 보기
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-6xl mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
@@ -129,7 +170,9 @@ export default function UserManagementPage() {
 
                 <div className="flex items-center gap-2">
                   <MapPin className="w-4 h-4 text-gray-500" />
-                  <span className="text-sm">{user.address}</span>
+                  <span className="text-sm">
+                    {user.address || "주소 정보 없음"}
+                  </span>
                 </div>
 
                 <div className="flex items-center gap-2">
