@@ -1,110 +1,75 @@
 "use client";
 
-import {
-  signinWithEmailPassword,
-  signInWithGoogle,
-  signInWithKakao,
-} from "@/utils/supabase/actions";
+import { signInWithGoogle, signInWithKakao } from "@/utils/supabase/actions";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
-import { useActionState, useState, useEffect } from "react";
+import { useState } from "react";
 import { Checkbox } from "../ui/checkbox";
 import { Label } from "../ui/label";
-import { toast } from "react-toastify";
+import { FcGoogle } from "react-icons/fc";
+import { RiKakaoTalkFill } from "react-icons/ri";
 import "react-toastify/dist/ReactToastify.css";
 import Image from "next/image";
-import { useAuthStore } from "@/lib/zustand/useAuthStore";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/utils/supabase/client";
-import { useUser } from "@/hooks/useUser";
-import { UserRole } from "@/types/api";
+import { useSearchParams } from "next/navigation";
 
-interface SignInFormProps {
-  redirectTo?: string;
-}
+import { signIn } from "next-auth/react";
+import { Button } from "../ui/button";
+import { toast } from "react-toastify";
 
-const SignInForm = ({ redirectTo = "/" }: SignInFormProps) => {
-  const router = useRouter();
-  const { initializeAuth, setAuthToken } = useAuthStore();
-  const { refetch: refetchUser } = useUser();
+export function LoginForm() {
+  const [isLoading, setIsLoading] = useState(false);
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
-  const [email, setEmail] = useState("");
-  const [isProcessingLogin, setIsProcessingLogin] = useState(false);
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
 
-  const [error, formAction, isPending] = useActionState<
-    { message?: string; success?: boolean }, // 반환 타입
-    FormData // formData 타입
-  >(async (_prev, formData) => {
-    const result = await signinWithEmailPassword(null, formData);
-
-    if (result?.success) {
-      setIsProcessingLogin(true);
-      const supabase = createClient();
-      const { data } = await supabase.auth.getSession();
-
-      if (data?.session?.access_token) {
-        console.log(
-          "액세스 토큰 저장:",
-          data.session.access_token.substring(0, 10) + "..."
-        );
-        // 토큰 상태 관리 통합
-        setAuthToken(data.session.access_token);
-
-        try {
-          // 세션 초기화 (fetchSession 대신 initializeAuth 사용)
-          await initializeAuth();
-
-          // 사용자 정보 갱신
-          await refetchUser();
-
-          // 로그인 성공 후 역할 확인을 위해 콜백 페이지로 리다이렉션
-          // 콜백 페이지에서 더 정확하게 역할 기반 라우팅 처리
-          console.log("로그인 성공: 콜백 페이지로 이동");
-          router.push(`/auth/callback/client?redirectTo=${redirectTo}`);
-        } catch (err) {
-          console.error("로그인 후 데이터 초기화 오류:", err);
-          router.push("/auth/callback/client");
-        } finally {
-          setIsProcessingLogin(false);
-        }
-      } else {
-        console.log("세션에 액세스 토큰이 없음");
-        router.push("/auth/callback/client");
-      }
-    } else {
-      console.log("로그인 실패:", result?.message);
-    }
-
-    return result;
-  }, {});
-
-  useEffect(() => {
-    const savedEmail = localStorage.getItem("rememberedEmail");
-    if (savedEmail) {
-      setEmail(savedEmail);
-      setRememberMe(true);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (error) {
-      toast.error(error.message, {
-        position: "top-right",
-        autoClose: 3000,
+  const handleSocialLogin = async (provider: string) => {
+    try {
+      setIsLoading(true);
+      await signIn(provider, {
+        callbackUrl,
       });
+    } catch (error) {
+      console.error(`${provider} 로그인 오류:`, error);
+    } finally {
+      setIsLoading(false);
     }
-  }, [error]);
+  };
 
-  const handleRememberMe = (checked: boolean) => {
-    setRememberMe(checked);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setIsLoading(true);
+      const result = await signIn("credentials", {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+      });
 
-    if (checked) {
-      localStorage.setItem("rememberedEmail", email);
-    } else {
-      localStorage.removeItem("rememberedEmail");
-      setEmail("");
+      if (result?.error) {
+        toast.error("이메일 또는 비밀번호가 올바르지 않습니다.");
+        return;
+      }
+
+      // 로그인 성공 시 리다이렉트
+      window.location.href = callbackUrl;
+    } catch (error) {
+      console.error("로그인 오류:", error);
+      toast.error("로그인 중 오류가 발생했습니다.");
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const inputLabel = [
@@ -125,15 +90,8 @@ const SignInForm = ({ redirectTo = "/" }: SignInFormProps) => {
   ];
 
   return (
-    <div className="sign-form">
-      <form
-        action={formAction}
-        onSubmit={(e) => {
-          if (rememberMe) {
-            localStorage.setItem("rememberedEmail", email);
-          }
-        }}
-      >
+    <form onSubmit={handleSubmit} className="sign-form">
+      <div>
         {inputLabel.map(({ label, name, type, required, placeholder }) => (
           <div key={name} className="flex flex-col gap-1 relative">
             <label className="flex items-center gap-1">{label} </label>
@@ -148,12 +106,10 @@ const SignInForm = ({ redirectTo = "/" }: SignInFormProps) => {
                     : type
                 }
                 name={name}
+                value={formData[name as keyof typeof formData]}
+                onChange={handleChange}
                 placeholder={placeholder}
                 required={required}
-                value={name === "email" ? email : undefined}
-                onChange={(e) => {
-                  if (name === "email") setEmail(e.target.value);
-                }}
               />
               {name === "password" && (
                 <button
@@ -170,12 +126,7 @@ const SignInForm = ({ redirectTo = "/" }: SignInFormProps) => {
 
         <div className="flex justify-between items-center my-4">
           <div className="flex items-center gap-2">
-            <Checkbox
-              id="rememberMe"
-              className="border-gray-400 rounded-sm"
-              checked={rememberMe}
-              onCheckedChange={handleRememberMe}
-            />
+            <Checkbox id="rememberMe" className="border-gray-400 rounded-sm" />
             <Label htmlFor="rememberMe">로그인 상태 유지</Label>
           </div>
           <Link
@@ -186,32 +137,39 @@ const SignInForm = ({ redirectTo = "/" }: SignInFormProps) => {
           </Link>
         </div>
 
-        <button
-          disabled={isPending || isProcessingLogin}
-          className="sign-btn w-full"
-        >
-          {isPending || isProcessingLogin ? "로그인 중..." : "로그인"}
+        <button type="submit" disabled={isLoading} className="sign-btn w-full">
+          {isLoading ? "로그인 중..." : "로그인"}
         </button>
-      </form>
+      </div>
 
-      <form className="flex justify-between items-center w-full max-w-2xl mt-4">
-        <button formAction={signInWithGoogle}>
-          <Image
-            src="/web_light_sq_SI.svg"
-            alt="구글 로그인"
-            width={171.5}
-            height={40}
-          />
-        </button>
-        <button formAction={signInWithKakao}>
-          <Image
-            src="/kakao_login_medium_narrow.png"
-            alt="카카오 로그인"
-            width={162.5}
-            height={40}
-          />
-        </button>
-      </form>
+      <div className="flex gap-3">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => handleSocialLogin("google")}
+          disabled={isLoading}
+          className="w-full flex items-center justify-center gap-2 py-4"
+        >
+          <FcGoogle className="h-5 w-5" />
+          <span>Google로 계속하기</span>
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => handleSocialLogin("kakao")}
+          disabled={isLoading}
+          className="w-full flex items-center justify-center gap-2 py-4 bg-[#FEE500] text-black hover:bg-[#FFDD00] hover:text-black"
+        >
+          <RiKakaoTalkFill className="h-5 w-5 text-black" />
+          <span>카카오로 계속하기</span>
+        </Button>
+
+        {searchParams.get("error") && (
+          <div className="p-4 text-sm text-red-500 bg-red-50 rounded-md">
+            로그인 중 오류가 발생했습니다. 다시 시도해 주세요.
+          </div>
+        )}
+      </div>
 
       <div className="flex w-full justify-center items-center gap-2 mt-2">
         <div className="text-gray-400 text-sm">계정이 없으신가요?</div>
@@ -222,8 +180,6 @@ const SignInForm = ({ redirectTo = "/" }: SignInFormProps) => {
           회원가입
         </Link>
       </div>
-    </div>
+    </form>
   );
-};
-
-export default SignInForm;
+}

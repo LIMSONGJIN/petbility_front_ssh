@@ -1,6 +1,5 @@
 "use client";
 
-import SignUpForm from "@/components/Forms/SignUpForm";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -14,6 +13,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { RegisterForm } from "@/components/Forms/SignUpForm";
 
 const SignUpPage = () => {
   const [agreements, setAgreements] = useState<{
@@ -47,27 +47,6 @@ const SignUpPage = () => {
         updated.all = updated.terms && updated.privacy && updated.marketing;
         return updated;
       });
-    }
-  };
-
-  const handleSubmit = () => {
-    if (!agreements.terms) {
-      termsRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-      return;
-    }
-    if (!agreements.privacy) {
-      privacyRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-      return;
-    }
-    if (!agreements.marketing) {
-      marketingRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-      return;
     }
   };
 
@@ -214,7 +193,9 @@ const SignUpPage = () => {
         </div>
       </div>
 
-      <SignUpForm agreements={agreements} />
+      <RegisterForm
+        agreements={{ terms: agreements.terms, privacy: agreements.privacy }}
+      />
     </motion.div>
   );
 };

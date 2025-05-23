@@ -9,6 +9,7 @@ import { createClient } from "@/utils/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { useAuthStore } from "@/lib/zustand/useAuthStore";
+import { UserProfile } from "../Forms/UserProfile";
 
 const navLinks = [
   {
@@ -141,111 +142,7 @@ export default function Header() {
         </nav>
 
         {/* Right Side - 로그인 상태별 UI 변경 */}
-        <div className=" flex items-center space-x-2">
-          <button className="block md:hidden header-btn-text">
-            <Search size={20} />
-          </button>
-
-          {/* 로그인 상태: 아이콘 & 프로필 표시 */}
-          {session ? (
-            <>
-              <button className="header-btn-text">
-                <Bell size={20} />
-              </button>
-              <button className="header-btn-text">
-                <ShoppingCart size={20} />
-              </button>
-              {/* 프로필 & 드롭다운 */}
-              <div className="relative" ref={profileDropdownRef}>
-                <button
-                  className="flex items-center space-x-2 focus:outline-none"
-                  onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                >
-                  <Image
-                    src={
-                      session.user.user_metadata.profile_image ||
-                      "/default-avatar.svg"
-                    }
-                    alt="User Avatar"
-                    width={32}
-                    height={32}
-                    className="rounded-full"
-                  />
-                  <span className="text-gray-700">
-                    {session.user.user_metadata.name}
-                  </span>
-                  <ChevronDown size={18} className="text-gray-700" />
-                </button>
-
-                {/* 드롭다운 메뉴 */}
-                <AnimatePresence>
-                  {profileDropdownOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.3, ease: "easeOut" }}
-                      className="absolute -right-10 mt-4 w-48 bg-white rounded-t-none rounded-lg overflow-hidden shadow-md"
-                    >
-                      <Link href="/profile" className="header-profile-link">
-                        내 정보 관리
-                      </Link>
-                      <Link href="/pets" className="header-profile-link">
-                        반려동물 관리
-                      </Link>
-                      <Link href="/inquiries" className="header-profile-link">
-                        문의하기
-                      </Link>
-                      <button
-                        onClick={handleSignOut}
-                        className="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 transition"
-                      >
-                        로그아웃
-                      </button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </>
-          ) : (
-            /* 비로그인 상태: 로그인 버튼 + 마름모 배경 표시 */
-            <>
-              <div
-                className="absolute hidden md:flex right-0 h-[68px] w-[300px] md:w-[200px] lg:w-[250px]"
-                style={{
-                  background: "linear-gradient(to right, violet, purple)",
-                  clipPath: "polygon(0% 100%, 100% 100%, 100% 0%, 20% 0%)",
-                }}
-              >
-                <div className=" relative h-full flex items-center justify-end">
-                  <Link
-                    href="/auth/signin"
-                    className="hidden md:flex z-30 -right-28 button--nina rounded-full px-4 py-2"
-                    data-text="LogIn"
-                  >
-                    <button>
-                      <span>L</span>
-                      <span>o</span>
-                      <span>g</span>
-                      <span>I</span>
-                      <span>n</span>
-                    </button>
-                  </Link>
-                </div>
-              </div>
-            </>
-          )}
-
-          <button
-            className="flex md:hidden p-2 text-gray-700"
-            onClick={(event) => {
-              event.stopPropagation();
-              setIsOpen((prev) => !prev);
-            }}
-          >
-            <Menu size={24} />
-          </button>
-        </div>
+        <UserProfile />
       </div>
 
       <AnimatePresence>

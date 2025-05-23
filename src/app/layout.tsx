@@ -3,6 +3,7 @@ import "./globals.css";
 import { ToastContainer } from "react-toastify";
 import { QueryProvider } from "@/lib/react-query/QueryProvider";
 import AuthProvider from "@/components/Providers/AuthProvider";
+import { SessionProvider } from "@/components/Providers/SessionProvider";
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -56,10 +57,10 @@ export default function RootLayout({
     <html lang="ko">
       <body>
         <QueryProvider>
-          <AuthProvider>
+          <SessionProvider>
             <div>{children}</div>
             <ToastContainer />
-          </AuthProvider>
+          </SessionProvider>
         </QueryProvider>
       </body>
     </html>
