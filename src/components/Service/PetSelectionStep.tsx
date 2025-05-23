@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { mockReservationData } from "@/data/service";
-import { Pet } from "@/types/api";
+import { Pet, userApi } from "@/app/api/user/user";
 import { toast } from "react-toastify";
 
 interface PetSelectionStepProps {
@@ -19,35 +18,16 @@ export default function PetSelectionStep({
   const [pets, setPets] = useState<Pet[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 반려동물 목록 불러오기 (실제 API 연동 시 사용)
   useEffect(() => {
     const fetchPets = async () => {
       try {
         setIsLoading(true);
-        // TODO: 실제 API 연동 시 아래 코드 사용
-        // const data = await petApi.getMyPets();
-        // setPets(data);
-
-        // 목업 데이터 사용
-        setTimeout(() => {
-          // 목업 데이터를 Pet 타입에 맞게 변환
-          const convertedPets = mockReservationData.pets.map((pet) => ({
-            pet_id: pet.id,
-            owner_id: "mock-owner-id",
-            name: pet.name,
-            type: pet.type,
-            breed: pet.breed,
-            age: pet.age,
-            image: pet.image,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          }));
-          setPets(convertedPets);
-          setIsLoading(false);
-        }, 500);
+        const data = await userApi.getMyPets();
+        setPets(data);
       } catch (error) {
         console.error("Failed to fetch pets:", error);
         toast.error("반려동물 목록을 불러오는데 실패했습니다.");
+      } finally {
         setIsLoading(false);
       }
     };
@@ -151,7 +131,7 @@ export default function PetSelectionStep({
                 <div>
                   <h3 className="font-medium text-lg">{pet.name}</h3>
                   <div className="text-gray-500 text-sm">
-                    <p>{pet.breed || pet.type}</p>
+                    <p>{pet.breed || pet.species}</p>
                     <p>
                       {pet.age ? `${pet.age}세` : ""}{" "}
                       {pet.weight ? `${pet.weight}kg` : ""}

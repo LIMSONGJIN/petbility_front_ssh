@@ -1,5 +1,6 @@
 import "next-auth";
 import { DefaultSession } from "next-auth";
+import NextAuth from "next-auth";
 
 declare module "next-auth" {
   /**
@@ -11,6 +12,7 @@ declare module "next-auth" {
       role: string;
       phone?: string;
       address?: string;
+      jwt?: any;
     } & DefaultSession["user"];
   }
 

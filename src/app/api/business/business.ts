@@ -13,8 +13,18 @@ import {
   BusinessSchedule,
 } from "@/types/reservation";
 import { Customer } from "@/types/business";
+import { getSession } from "next-auth/react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+
+// 토큰 가져오는 유틸리티 함수
+const getAuthToken = async () => {
+  const session = await getSession();
+  if (!session?.user?.jwt) {
+    throw new Error("인증 토큰이 없습니다.");
+  }
+  return session.user.jwt;
+};
 
 // 비즈니스 서비스 관련 API 응답 타입
 export interface BusinessServiceResponse {
@@ -31,8 +41,7 @@ export const businessServiceApi = {
     serviceId: string,
     status: "active" | "inactive"
   ): Promise<BusinessServiceResponse> => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("인증 토큰이 없습니다.");
+    const token = await getAuthToken();
 
     console.log("API 호출 → PATCH", {
       serviceId,
@@ -96,8 +105,7 @@ export const businessReservationApi = {
   getReservations: async (
     params?: PaginationParams & { user_id?: string }
   ): Promise<PaginatedResponse<Reservation>> => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("인증 토큰이 없습니다.");
+    const token = await getAuthToken();
 
     try {
       const response = await fetch(
@@ -139,8 +147,7 @@ export const businessReservationApi = {
 
   // 특정 예약 조회
   getReservation: async (id: string): Promise<Reservation> => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("인증 토큰이 없습니다.");
+    const token = await getAuthToken();
 
     try {
       const response = await fetch(`${API_URL}/business/reservations/${id}`, {
@@ -170,8 +177,7 @@ export const businessReservationApi = {
     id: string,
     status: ReservationStatus
   ): Promise<Reservation> => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("인증 토큰이 없습니다.");
+    const token = await getAuthToken();
 
     const response = await fetch(
       `${API_URL}/business/reservations/${id}/status`,
@@ -201,8 +207,7 @@ export const businessScheduleApi = {
     businessId: string,
     payload: ManageBusinessSchedulePayload
   ): Promise<void> => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("인증 토큰이 없습니다.");
+    const token = await getAuthToken();
 
     const response = await fetch(`${API_URL}/business/schedule/${businessId}`, {
       method: "POST",
@@ -223,8 +228,7 @@ export const businessScheduleApi = {
   getBusinessSchedule: async (
     businessId: string
   ): Promise<ManageBusinessSchedulePayload> => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("인증 토큰이 없습니다.");
+    const token = await getAuthToken();
 
     const response = await fetch(`${API_URL}/business/schedule/${businessId}`, {
       headers: {
@@ -244,8 +248,7 @@ export const businessScheduleApi = {
     businessId: string,
     date: string
   ): Promise<AvailableTimeSlots> => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("인증 토큰이 없습니다.");
+    const token = await getAuthToken();
 
     const response = await fetch(
       `${API_URL}/business/schedule/${businessId}/date?date=${date}`,
@@ -268,8 +271,7 @@ export const businessScheduleApi = {
 export const businessApi = {
   // 사용자 목록 조회
   getUsers: async (): Promise<Customer[]> => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("인증 토큰이 없습니다.");
+    const token = await getAuthToken();
 
     try {
       const response = await fetch(`${API_URL}/business/users`, {
@@ -292,8 +294,7 @@ export const businessApi = {
 
   // 특정 사용자 조회
   getUser: async (userId: string): Promise<Customer> => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("인증 토큰이 없습니다.");
+    const token = await getAuthToken();
 
     try {
       const response = await fetch(`${API_URL}/business/users/${userId}`, {
@@ -321,8 +322,7 @@ export const businessApi = {
     userId: string,
     userData: Partial<Customer>
   ): Promise<Customer> => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("인증 토큰이 없습니다.");
+    const token = await getAuthToken();
 
     try {
       const response = await fetch(`${API_URL}/business/users/${userId}`, {
@@ -352,5 +352,198 @@ export const businessApi = {
         updated_at: new Date().toISOString(),
       } as Customer;
     }
+  },
+
+  // 비즈니스 정보 조회
+  getBusinessInfo: async (businessId: string) => {
+    const token = await getAuthToken();
+
+    const response = await fetch(`${API_URL}/businesses/${businessId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        errorData.message || "비즈니스 정보를 불러오는데 실패했습니다."
+      );
+    }
+
+    return response.json();
+  },
+
+  // 비즈니스 정보 수정
+  updateBusinessInfo: async (businessId: string, updateData: any) => {
+    const token = await getAuthToken();
+
+    const response = await fetch(`${API_URL}/businesses/${businessId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(updateData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        errorData.message || "비즈니스 정보 수정에 실패했습니다."
+      );
+    }
+
+    return response.json();
+  },
+
+  // 비즈니스 서비스 목록 조회
+  getBusinessServices: async (businessId: string) => {
+    const token = await getAuthToken();
+
+    const response = await fetch(
+      `${API_URL}/businesses/${businessId}/services`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        errorData.message || "서비스 목록을 불러오는데 실패했습니다."
+      );
+    }
+
+    return response.json();
+  },
+
+  // 비즈니스 서비스 추가
+  addBusinessService: async (businessId: string, serviceData: any) => {
+    const token = await getAuthToken();
+
+    const response = await fetch(
+      `${API_URL}/businesses/${businessId}/services`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(serviceData),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "서비스 추가에 실패했습니다.");
+    }
+
+    return response.json();
+  },
+
+  // 비즈니스 서비스 수정
+  updateBusinessService: async (
+    businessId: string,
+    serviceId: string,
+    updateData: any
+  ) => {
+    const token = await getAuthToken();
+
+    const response = await fetch(
+      `${API_URL}/businesses/${businessId}/services/${serviceId}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(updateData),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "서비스 수정에 실패했습니다.");
+    }
+
+    return response.json();
+  },
+
+  // 비즈니스 서비스 삭제
+  deleteBusinessService: async (businessId: string, serviceId: string) => {
+    const token = await getAuthToken();
+
+    const response = await fetch(
+      `${API_URL}/businesses/${businessId}/services/${serviceId}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "서비스 삭제에 실패했습니다.");
+    }
+
+    return { success: true };
+  },
+
+  // 비즈니스 예약 목록 조회
+  getBusinessReservations: async (businessId: string) => {
+    const token = await getAuthToken();
+
+    const response = await fetch(
+      `${API_URL}/businesses/${businessId}/reservations`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        errorData.message || "예약 목록을 불러오는데 실패했습니다."
+      );
+    }
+
+    return response.json();
+  },
+
+  // 비즈니스 예약 상태 업데이트
+  updateReservationStatus: async (
+    businessId: string,
+    reservationId: string,
+    status: string
+  ) => {
+    const token = await getAuthToken();
+
+    const response = await fetch(
+      `${API_URL}/businesses/${businessId}/reservations/${reservationId}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        errorData.message || "예약 상태 업데이트에 실패했습니다."
+      );
+    }
+
+    return response.json();
   },
 };

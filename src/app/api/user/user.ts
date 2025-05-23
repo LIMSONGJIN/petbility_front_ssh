@@ -4,6 +4,7 @@ import {
   ReservationStatus,
   CreateReservationData,
 } from "@/types/api";
+import { getSession } from "next-auth/react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
@@ -15,14 +16,20 @@ interface UpdateReservationData {
 }
 
 export interface Business {
+  id: string;
   user_id: string;
-  email: string;
   name: string;
-  profileImage: string;
+  email: string;
   address: string;
   phone: string;
+  profile_image: string | null;
+  description: string | null;
   latitude: number | null;
   longitude: number | null;
+  rating: number | null;
+  review_count: number | null;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface ServiceWithBusiness {
@@ -83,14 +90,44 @@ export interface DailySchedule {
   } | null;
 }
 
+export interface Pet {
+  pet_id: string;
+  owner_id: string;
+  name: string;
+  species: string;
+  breed: string | null;
+  age: number | null;
+  weight: number | null;
+  image: string | null;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface CreatePetData {
+  name: string;
+  species: string;
+  breed: string;
+  age: number;
+  weight: number;
+  photo: string;
+}
+
+// 토큰 가져오는 유틸리티 함수
+const getAuthToken = async () => {
+  const session = await getSession();
+  if (!session?.user?.jwt) {
+    throw new Error("인증 토큰이 없습니다.");
+  }
+  return session.user.jwt;
+};
+
 // 사용자 예약 관련 API
 export const userReservationApi = {
   // 예약 생성
   createReservation: async (
     reservationData: CreateReservationData
   ): Promise<Reservation> => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("인증 토큰이 없습니다.");
+    const token = await getAuthToken();
 
     const response = await fetch(`${API_URL}/reservations`, {
       method: "POST",
@@ -115,8 +152,7 @@ export const userReservationApi = {
 
   // 사용자의 예약 목록 조회
   getMyReservations: async (): Promise<Reservation[]> => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("인증 토큰이 없습니다.");
+    const token = await getAuthToken();
 
     const response = await fetch(`${API_URL}/reservations/my-reservations`, {
       headers: {
@@ -136,8 +172,7 @@ export const userReservationApi = {
 
   // 특정 예약 조회
   getReservation: async (reservationId: string): Promise<Reservation> => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("인증 토큰이 없습니다.");
+    const token = await getAuthToken();
 
     const response = await fetch(`${API_URL}/reservations/${reservationId}`, {
       headers: {
@@ -160,8 +195,7 @@ export const userReservationApi = {
     reservationId: string,
     updateData: UpdateReservationData
   ): Promise<Reservation> => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("인증 토큰이 없습니다.");
+    const token = await getAuthToken();
 
     const response = await fetch(`${API_URL}/reservations/${reservationId}`, {
       method: "PATCH",
@@ -184,8 +218,7 @@ export const userReservationApi = {
   cancelReservation: async (
     reservationId: string
   ): Promise<{ success: boolean }> => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("인증 토큰이 없습니다.");
+    const token = await getAuthToken();
 
     const response = await fetch(`${API_URL}/reservations/${reservationId}`, {
       method: "DELETE",
@@ -204,8 +237,7 @@ export const userReservationApi = {
 
   // 서비스 목록 조회
   getAllServices: async (): Promise<any[]> => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("인증 토큰이 없습니다.");
+    const token = await getAuthToken();
 
     const response = await fetch(`${API_URL}/reservations/services`, {
       headers: {
@@ -227,8 +259,7 @@ export const userReservationApi = {
   getBusinessesByServiceId: async (
     serviceId: string
   ): Promise<ServiceWithBusiness[]> => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("인증 토큰이 없습니다.");
+    const token = await getAuthToken();
 
     const response = await fetch(
       `${API_URL}/reservations/services/${serviceId}/businesses`,
@@ -256,8 +287,7 @@ export const userReservationApi = {
     serviceId: string,
     date: string
   ): Promise<string[]> => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("인증 토큰이 없습니다.");
+    const token = await getAuthToken();
 
     const response = await fetch(
       `${API_URL}/reservations/businesses/${businessId}/services/${serviceId}/available-times/${date}`,
@@ -283,8 +313,7 @@ export const userReservationApi = {
     businessId: string,
     serviceId?: string
   ): Promise<string[]> => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("인증 토큰이 없습니다.");
+    const token = await getAuthToken();
 
     let url = `${API_URL}/reservations/businesses/${businessId}/disabled-dates`;
     if (serviceId) url += `?service_id=${serviceId}`;
@@ -311,8 +340,7 @@ export const userReservationApi = {
     serviceId: string,
     yearMonth: string
   ): Promise<MonthlySchedule> => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("인증 토큰이 없습니다.");
+    const token = await getAuthToken();
 
     const response = await fetch(
       `${API_URL}/reservations/businesses/${businessId}/services/${serviceId}/schedules/${yearMonth}`,
@@ -339,8 +367,7 @@ export const userReservationApi = {
     serviceId: string,
     date: string
   ): Promise<DailySchedule> => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("인증 토큰이 없습니다.");
+    const token = await getAuthToken();
 
     const response = await fetch(
       `${API_URL}/reservations/businesses/${businessId}/services/${serviceId}/schedules/${date}`,
@@ -366,8 +393,7 @@ export const userReservationApi = {
 export const userApi = {
   // 사용자 목록 조회
   getUsers: async (): Promise<any[]> => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("인증 토큰이 없습니다.");
+    const token = await getAuthToken();
 
     const response = await fetch(`${API_URL}/users`, {
       headers: {
@@ -383,5 +409,63 @@ export const userApi = {
     }
 
     return response.json();
+  },
+
+  // 사용자의 반려동물 목록 조회
+  getMyPets: async (): Promise<Pet[]> => {
+    const token = await getAuthToken();
+
+    const response = await fetch(`${API_URL}/pets`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        errorData.message || "반려동물 목록을 불러오는데 실패했습니다."
+      );
+    }
+
+    return response.json();
+  },
+
+  // 반려동물 등록
+  createPet: async (petData: CreatePetData): Promise<Pet> => {
+    const token = await getAuthToken();
+
+    const response = await fetch(`${API_URL}/pets`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(petData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "반려동물 등록에 실패했습니다.");
+    }
+
+    return response.json();
+  },
+
+  // 반려동물 삭제
+  deletePet: async (petId: string): Promise<void> => {
+    const token = await getAuthToken();
+
+    const response = await fetch(`${API_URL}/pets/${petId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "반려동물 삭제에 실패했습니다.");
+    }
   },
 };

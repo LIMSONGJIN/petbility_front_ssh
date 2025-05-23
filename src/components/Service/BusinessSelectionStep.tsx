@@ -21,16 +21,16 @@ export default function BusinessSelectionStep({
   const [selectedBusinessId, setSelectedBusinessId] = useState<string>("");
 
   const handleSelectBusiness = (serviceBusiness: ServiceWithBusiness) => {
-    setSelectedBusinessId(serviceBusiness.business.user_id);
+    setSelectedBusinessId(serviceBusiness.business.id);
   };
 
   const handleNext = () => {
     const selectedServiceBusiness = serviceBusinesses.find(
-      (sb) => sb.business.user_id === selectedBusinessId
+      (sb) => sb.business.id === selectedBusinessId
     );
     if (selectedServiceBusiness) {
       onNext(
-        selectedServiceBusiness.business.user_id,
+        selectedServiceBusiness.business.id,
         selectedServiceBusiness.business.name
       );
     }
@@ -92,20 +92,20 @@ export default function BusinessSelectionStep({
 
           return (
             <Card
-              key={business.user_id || `business-${index}`}
+              key={business.id || `business-${index}`}
               className={`cursor-pointer transition-colors ${
-                selectedBusinessId === business.user_id
+                selectedBusinessId === business.id
                   ? "border-2 border-violet-500"
                   : "border border-gray-200 hover:border-violet-300"
               }`}
               onClick={() => handleSelectBusiness(serviceBusiness)}
             >
-              <CardContent className="p-4 flex items-start gap-4">
+              <CardContent className="flex items-start space-x-4 p-4">
                 <div
                   className="w-16 h-16 bg-gray-200 rounded-md flex-shrink-0"
                   style={{
-                    backgroundImage: business.profileImage
-                      ? `url(${business.profileImage})`
+                    backgroundImage: business.profile_image
+                      ? `url(${business.profile_image})`
                       : "none",
                     backgroundSize: "cover",
                     backgroundPosition: "center",

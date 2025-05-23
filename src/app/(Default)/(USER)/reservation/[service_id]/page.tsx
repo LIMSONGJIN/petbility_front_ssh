@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { AnimatePresence } from "framer-motion";
+import { useSession } from "next-auth/react";
 import BusinessSelectionStep from "@/components/Service/BusinessSelectionStep";
 import DateTimeStep from "@/components/Service/DateTimeStep";
 import PetSelectionStep from "@/components/Service/PetSelectionStep";
@@ -13,7 +14,6 @@ import { userReservationApi } from "@/app/api/user/user";
 import { Business, ServiceWithBusiness } from "@/app/api/user/user";
 import { toast } from "react-toastify";
 import { CreateReservationData } from "@/types/api";
-import { useAuthStore } from "@/lib/zustand/useAuthStore";
 
 interface ReservationData {
   business_id: string;
@@ -27,7 +27,7 @@ interface ReservationData {
 export default function ReservationPage() {
   const { service_id } = useParams();
   const router = useRouter();
-  const { isAuthenticated, isLoading: authLoading } = useAuthStore();
+  const { data: session, status } = useSession();
   const [currentStep, setCurrentStep] = useState(1);
   const [reservationData, setReservationData] = useState<ReservationData>({
     business_id: "",
@@ -46,19 +46,19 @@ export default function ReservationPage() {
 
   // 로그인 상태 확인
   useEffect(() => {
-    // 인증 로딩이 완료되었고, 로그인되지 않은 경우
-    if (!authLoading && !isAuthenticated) {
+    // 세션 상태가 로딩이 아니고, 로그인되지 않은 경우
+    if (status === "unauthenticated") {
       // 현재 페이지 URL을 리다이렉트 파라미터로 포함
       const redirectPath = encodeURIComponent(window.location.pathname);
-      router.push(`/auth/signin?redirectTo=${redirectPath}`);
+      router.push(`/auth/login?callbackUrl=${redirectPath}`);
       toast.info("예약을 위해서는 로그인이 필요합니다.");
     }
-  }, [authLoading, isAuthenticated, router]);
+  }, [status, router]);
 
   // 서비스 상세 및 사업자 목록 불러오기
   useEffect(() => {
     // 인증되지 않았으면 API 호출 중단
-    if (!isAuthenticated) return;
+    if (status !== "authenticated") return;
 
     const fetchBusinesses = async () => {
       try {
@@ -90,10 +90,10 @@ export default function ReservationPage() {
     if (service_id) {
       fetchBusinesses();
     }
-  }, [service_id, isAuthenticated]);
+  }, [service_id, status]);
 
   // 로그인 또는 데이터 로딩 중인 경우 로딩 표시
-  if (authLoading) {
+  if (status === "loading") {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-violet-500"></div>
@@ -102,7 +102,7 @@ export default function ReservationPage() {
   }
 
   // 인증되지 않은 경우 빈 컴포넌트 반환 (리다이렉트 처리됨)
-  if (!isAuthenticated) {
+  if (status === "unauthenticated") {
     return null;
   }
 

@@ -6,6 +6,7 @@ import KakaoProvider from "next-auth/providers/kakao";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import prisma from "@/lib/prisma";
+import jwt from "jsonwebtoken";
 import type {
   GetServerSidePropsContext,
   NextApiRequest,
@@ -90,6 +91,26 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.role = user.role || "USER";
+
+        // JWT 토큰 생성 및 디코딩
+        const jwtToken = jwt.sign(
+          {
+            name: user.name,
+            email: user.email,
+            sub: user.id,
+            role: user.role,
+          },
+          process.env.NEXTAUTH_SECRET || "",
+          { expiresIn: "30d" }
+        );
+
+        // 디코딩된 토큰 정보 출력
+        const decodedToken = jwt.decode(jwtToken);
+        console.log("Generated JWT Token:", jwtToken);
+        console.log("Decoded JWT Token:", decodedToken);
+
+        // 토큰 정보를 세션에서 사용할 수 있도록 저장
+        token.jwt = jwtToken;
       }
 
       // 매번 호출될 때마다 최신 사용자 정보 확인
@@ -98,6 +119,9 @@ export const authOptions: NextAuthOptions = {
           const latestUser = await prisma.user.findUnique({
             where: { id: token.id as string },
           });
+          if (latestUser) {
+            token.role = latestUser.role;
+          }
         } catch (error) {
           console.error("JWT callback error:", error);
         }
@@ -111,6 +135,7 @@ export const authOptions: NextAuthOptions = {
       if (token && session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
+        session.user.jwt = token.jwt; // JWT 토큰을 세션에 포함
       }
 
       return session;

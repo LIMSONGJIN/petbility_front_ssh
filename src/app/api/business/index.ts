@@ -18,8 +18,18 @@ import {
   dummySalesSummary,
   dummyBusinessStats,
 } from "@/data/dummy/business";
+import { getSession } from "next-auth/react";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+
+// 토큰 가져오는 유틸리티 함수
+const getAuthToken = async () => {
+  const session = await getSession();
+  if (!session?.user?.jwt) {
+    throw new Error("인증 토큰이 없습니다.");
+  }
+  return session.user.jwt;
+};
 
 // API Reservation을 Business Reservation으로 변환하는 함수
 const convertToBusinessReservation = (
@@ -48,7 +58,7 @@ export const serviceApi = {
     params?: PaginationParams
   ): Promise<PaginatedResponse<Service>> => {
     try {
-      const token = localStorage.getItem("token");
+      const token = await getAuthToken();
       const response = await fetch(
         `${API_BASE_URL}/business/reservations/services`,
         {
@@ -84,7 +94,7 @@ export const serviceApi = {
 
   getService: async (id: string): Promise<Service> => {
     try {
-      const token = localStorage.getItem("token");
+      const token = await getAuthToken();
       const response = await fetch(`${API_BASE_URL}/business/services/${id}`, {
         headers: {
           "Content-Type": "application/json",
@@ -108,7 +118,7 @@ export const serviceApi = {
     service: Partial<Service>
   ): Promise<Service> => {
     try {
-      const token = localStorage.getItem("token");
+      const token = await getAuthToken();
       const response = await fetch(`${API_BASE_URL}/business/services/${id}`, {
         method: "PATCH",
         headers: {
@@ -138,7 +148,7 @@ export const serviceApi = {
     status: Service["status"]
   ): Promise<Service> => {
     try {
-      const token = localStorage.getItem("token");
+      const token = await getAuthToken();
       const response = await fetch(
         `${API_BASE_URL}/business/reservations/services/${id}/status`,
         {
@@ -173,7 +183,7 @@ export const userApi = {
     params?: PaginationParams
   ): Promise<PaginatedResponse<Customer>> => {
     try {
-      const token = localStorage.getItem("token");
+      const token = await getAuthToken();
       const response = await fetch(
         `${API_BASE_URL}/business/users?${new URLSearchParams(params as any)}`,
         {
@@ -201,7 +211,7 @@ export const userApi = {
 
   getUser: async (id: string): Promise<Customer> => {
     try {
-      const token = localStorage.getItem("token");
+      const token = await getAuthToken();
       const response = await fetch(`${API_BASE_URL}/business/users/${id}`, {
         headers: {
           "Content-Type": "application/json",
@@ -224,7 +234,7 @@ export const userApi = {
     user: Omit<Customer, "user_id" | "created_at" | "updated_at">
   ): Promise<Customer> => {
     try {
-      const token = localStorage.getItem("token");
+      const token = await getAuthToken();
       const response = await fetch(`${API_BASE_URL}/business/users`, {
         method: "POST",
         headers: {
@@ -254,7 +264,7 @@ export const userApi = {
     user: Partial<Customer>
   ): Promise<Customer> => {
     try {
-      const token = localStorage.getItem("token");
+      const token = await getAuthToken();
       const response = await fetch(`${API_BASE_URL}/business/users/${id}`, {
         method: "PATCH",
         headers: {
@@ -286,7 +296,7 @@ export const reservationApi = {
     params?: PaginationParams & { user_id?: string }
   ): Promise<PaginatedResponse<BusinessReservation>> => {
     try {
-      const token = localStorage.getItem("token");
+      const token = await getAuthToken();
       const response = await fetch(
         `${API_BASE_URL}/business/reservations?${new URLSearchParams(
           params as any
@@ -323,7 +333,7 @@ export const reservationApi = {
 
   getReservation: async (id: string): Promise<BusinessReservation> => {
     try {
-      const token = localStorage.getItem("token");
+      const token = await getAuthToken();
       const response = await fetch(
         `${API_BASE_URL}/business/reservations/${id}`,
         {
@@ -353,7 +363,7 @@ export const reservationApi = {
     >
   ): Promise<Reservation> => {
     try {
-      const token = localStorage.getItem("token");
+      const token = await getAuthToken();
       const response = await fetch(`${API_BASE_URL}/business/reservations`, {
         method: "POST",
         headers: {
@@ -383,7 +393,7 @@ export const reservationApi = {
     reservation: Partial<Reservation>
   ): Promise<Reservation> => {
     try {
-      const token = localStorage.getItem("token");
+      const token = await getAuthToken();
       const response = await fetch(
         `${API_BASE_URL}/business/reservations/${id}`,
         {
@@ -416,7 +426,7 @@ export const reservationApi = {
     status: Reservation["status"]
   ): Promise<Reservation> => {
     try {
-      const token = localStorage.getItem("token");
+      const token = await getAuthToken();
       const response = await fetch(
         `${API_BASE_URL}/business/reservations/${id}/status`,
         {
@@ -449,7 +459,7 @@ export const reservationApi = {
 export const salesApi = {
   getSalesData: async (timeRange: TimeRange): Promise<SalesData[]> => {
     try {
-      const token = localStorage.getItem("token");
+      const token = await getAuthToken();
       const response = await fetch(
         `${API_BASE_URL}/business/sales/data?${new URLSearchParams(
           timeRange as any
@@ -473,7 +483,7 @@ export const salesApi = {
 
   getSalesSummary: async (timeRange: TimeRange): Promise<SalesSummary> => {
     try {
-      const token = localStorage.getItem("token");
+      const token = await getAuthToken();
       const response = await fetch(
         `${API_BASE_URL}/business/sales/summary?${new URLSearchParams(
           timeRange as any
@@ -500,7 +510,7 @@ export const salesApi = {
 export const statsApi = {
   getBusinessStats: async (): Promise<BusinessStats> => {
     try {
-      const token = localStorage.getItem("token");
+      const token = await getAuthToken();
       const response = await fetch(`${API_BASE_URL}/business/stats`, {
         headers: {
           "Content-Type": "application/json",
@@ -515,5 +525,201 @@ export const statsApi = {
       // 실패 시 더미데이터 반환
       return dummyBusinessStats;
     }
+  },
+};
+
+// 비즈니스 API
+export const businessApi = {
+  // 비즈니스 정보 조회
+  getBusinessInfo: async (businessId: string) => {
+    const token = await getAuthToken();
+
+    const response = await fetch(`${API_BASE_URL}/businesses/${businessId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        errorData.message || "비즈니스 정보를 불러오는데 실패했습니다."
+      );
+    }
+
+    return response.json();
+  },
+
+  // 비즈니스 정보 수정
+  updateBusinessInfo: async (businessId: string, updateData: any) => {
+    const token = await getAuthToken();
+
+    const response = await fetch(`${API_BASE_URL}/businesses/${businessId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(updateData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        errorData.message || "비즈니스 정보 수정에 실패했습니다."
+      );
+    }
+
+    return response.json();
+  },
+
+  // 비즈니스 서비스 목록 조회
+  getBusinessServices: async (businessId: string) => {
+    const token = await getAuthToken();
+
+    const response = await fetch(
+      `${API_BASE_URL}/businesses/${businessId}/services`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        errorData.message || "서비스 목록을 불러오는데 실패했습니다."
+      );
+    }
+
+    return response.json();
+  },
+
+  // 비즈니스 서비스 추가
+  addBusinessService: async (businessId: string, serviceData: any) => {
+    const token = await getAuthToken();
+
+    const response = await fetch(
+      `${API_BASE_URL}/businesses/${businessId}/services`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(serviceData),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "서비스 추가에 실패했습니다.");
+    }
+
+    return response.json();
+  },
+
+  // 비즈니스 서비스 수정
+  updateBusinessService: async (
+    businessId: string,
+    serviceId: string,
+    updateData: any
+  ) => {
+    const token = await getAuthToken();
+
+    const response = await fetch(
+      `${API_BASE_URL}/businesses/${businessId}/services/${serviceId}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(updateData),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "서비스 수정에 실패했습니다.");
+    }
+
+    return response.json();
+  },
+
+  // 비즈니스 서비스 삭제
+  deleteBusinessService: async (businessId: string, serviceId: string) => {
+    const token = await getAuthToken();
+
+    const response = await fetch(
+      `${API_BASE_URL}/businesses/${businessId}/services/${serviceId}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "서비스 삭제에 실패했습니다.");
+    }
+
+    return { success: true };
+  },
+
+  // 비즈니스 예약 목록 조회
+  getBusinessReservations: async (businessId: string) => {
+    const token = await getAuthToken();
+
+    const response = await fetch(
+      `${API_BASE_URL}/businesses/${businessId}/reservations`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        errorData.message || "예약 목록을 불러오는데 실패했습니다."
+      );
+    }
+
+    return response.json();
+  },
+
+  // 비즈니스 예약 상태 업데이트
+  updateReservationStatus: async (
+    businessId: string,
+    reservationId: string,
+    status: string
+  ) => {
+    const token = await getAuthToken();
+
+    const response = await fetch(
+      `${API_BASE_URL}/businesses/${businessId}/reservations/${reservationId}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        errorData.message || "예약 상태 업데이트에 실패했습니다."
+      );
+    }
+
+    return response.json();
   },
 };

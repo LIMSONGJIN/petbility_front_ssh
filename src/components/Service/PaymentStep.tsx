@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { mockReservationData, services } from "@/data/service";
+import { services } from "@/data/service";
 import { ServiceCategory } from "@/types/api";
 import { serviceApi } from "@/app/api/service";
 import { toast } from "react-toastify";
 import { getTossPayments } from "@/lib/tossPayments";
 import { useRouter } from "next/navigation";
-import { useReservationStore } from "@/store/reservationStore";
-import { paymentApi } from "@/app/api/payment";
+import { paymentApi, CreatePaymentRequestDto } from "@/app/api/payment";
 import { loadTossPayments } from "@tosspayments/payment-sdk";
+import { Pet, userApi } from "@/app/api/user/user";
 
 interface PaymentStepProps {
   onNext: (notes: string) => void;
@@ -19,7 +19,6 @@ interface PaymentStepProps {
   selectedPetId: string;
   businessId: string;
   businessName: string;
-  reservationId?: string;
 }
 
 export default function PaymentStep({
@@ -31,122 +30,111 @@ export default function PaymentStep({
   selectedPetId,
   businessId,
   businessName,
-  reservationId,
 }: PaymentStepProps) {
   const router = useRouter();
   const [notes, setNotes] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [serviceDetails, setServiceDetails] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const { setReservationData } = useReservationStore();
+  const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
 
-  // 서비스 정보 불러오기
   useEffect(() => {
-    const fetchServiceDetails = async () => {
+    const fetchData = async () => {
       try {
         setIsLoading(true);
-        const data = await serviceApi.getServiceById(serviceType);
-        setServiceDetails(data);
+        const [serviceData, petsData] = await Promise.all([
+          serviceApi.getServiceById(serviceType),
+          userApi.getMyPets(),
+        ]);
+
+        setServiceDetails(serviceData);
+        const pet = petsData.find((p) => p.pet_id === selectedPetId);
+        setSelectedPet(pet || null);
       } catch (error) {
-        console.error("Failed to fetch service details:", error);
-        toast.error("서비스 정보를 불러오는데 실패했습니다.");
+        console.error("Failed to fetch data:", error);
+        toast.error("정보를 불러오는데 실패했습니다.");
       } finally {
         setIsLoading(false);
       }
     };
 
-    if (serviceType) {
-      fetchServiceDetails();
+    if (serviceType && selectedPetId) {
+      fetchData();
     }
-  }, [serviceType]);
+  }, [serviceType, selectedPetId]);
 
-  const selectedPet = mockReservationData.pets.find(
-    (pet) => pet.id === selectedPetId
-  );
+  const servicePrice = serviceDetails?.price || 0;
 
-  const servicePrice =
-    serviceDetails?.price ||
-    mockReservationData.servicePrices[
-      serviceType as keyof typeof mockReservationData.servicePrices
-    ] ||
-    0;
-
-  // 서비스 타입을 사용자가 이해하기 쉬운 이름으로 매핑
   const getServiceName = (type: string): string => {
-    // 서비스 상세 정보가 로드된 경우
     if (serviceDetails?.name) {
       return serviceDetails.name;
     }
-
-    // 서비스 ID로 서비스 목록에서 찾기
     const service = services.find((s) => s.service_id === type);
     if (service) {
       return service.name;
     }
-
-    // 서비스 카테고리로 매핑
-    switch (type) {
-      case ServiceCategory.FUNERAL:
-        return "장례 서비스";
-      case ServiceCategory.CREMATION:
-        return "화장 서비스";
-      case ServiceCategory.GROOMING:
-        return "미용 서비스";
-      case ServiceCategory.BATHING:
-        return "목욕 서비스";
-      case ServiceCategory.CUSTOM_VEHICLES:
-        return "맞춤 차량 서비스";
-      case ServiceCategory.OTHER_CARE:
-        return "기타 케어 서비스";
-      default:
-        // UUID 형식인 경우 서비스 ID로 처리
-        if (type.includes("-")) {
-          // 서비스 ID로 서비스 목록에서 찾기
-          const serviceById = services.find((s) => s.service_id === type);
-          if (serviceById) {
-            return serviceById.name;
-          }
-          return "서비스";
-        }
-        return type;
+    if (type.includes("-")) {
+      const serviceById = services.find((s) => s.service_id === type);
+      if (serviceById) {
+        return serviceById.name;
+      }
+      return "서비스";
     }
+    return type;
   };
 
   const handlePayment = async () => {
-    try {
-      setIsLoading(true);
+    if (!serviceDetails || !selectedPet) {
+      toast.error("서비스 또는 반려동물 정보를 불러올 수 없습니다.");
+      return;
+    }
 
-      // 서비스 시작 시간 계산
+    try {
+      setIsProcessing(true);
+
       const startDate = new Date(selectedDate);
       const [hours, minutes] = selectedTime.split(":").map(Number);
-      startDate.setHours(hours, minutes);
+      startDate.setHours(hours, minutes, 0, 0);
 
-      // 결제 요청 API 호출
-      const paymentRequest = await paymentApi.requestPayment({
+      const createPaymentDto: CreatePaymentRequestDto = {
+        amount: Number(servicePrice),
         service_id: serviceType,
         business_id: businessId,
-        amount: Number(servicePrice),
         pet_id: selectedPetId,
         start_time: startDate.toISOString(),
-        notes: notes,
-      });
+        notes: notes || undefined,
+      };
 
-      // 토스페이먼츠 결제창 열기
-      const tossPayments = await getTossPayments();
+      const response = await paymentApi.requestPayment(createPaymentDto);
+
+      if (!response.success || !response.data) {
+        throw new Error(response.message || "결제 요청에 실패했습니다.");
+      }
+
+      const paymentData = response.data;
+
+      const tossPayments = await loadTossPayments(
+        process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY ||
+          "test_ck_DnyRpQWGrNbdwvRLRnqLrKwv1M9E"
+      );
 
       await tossPayments.requestPayment("카드", {
-        amount: paymentRequest.amount,
-        orderId: paymentRequest.orderId,
+        amount: paymentData.amount,
+        orderId: paymentData.orderId,
         orderName: getServiceName(serviceType),
-        customerName: paymentRequest.ordererName,
-        customerEmail: paymentRequest.ordererEmail,
-        successUrl: `${window.location.origin}/payments/success`,
-        failUrl: `${window.location.origin}/payments/fail`,
+        customerName: selectedPet?.name || "고객",
+        successUrl: paymentData.successUrl,
+        failUrl: paymentData.failUrl,
       });
     } catch (error) {
       console.error("결제 요청 중 오류:", error);
-      toast.error("결제 처리 중 오류가 발생했습니다.");
-      setIsLoading(false);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "결제 처리 중 오류가 발생했습니다.";
+      toast.error(errorMessage);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -195,7 +183,8 @@ export default function PaymentStep({
               <p>날짜: {formatDate(selectedDate)}</p>
               <p>시간: {selectedTime}</p>
               <p>
-                반려동물: {selectedPet?.name} ({selectedPet?.type})
+                반려동물: {selectedPet?.name} ({selectedPet?.species})
+                {selectedPet?.breed && ` - ${selectedPet.breed}`}
               </p>
               <p>서비스: {getServiceName(serviceType)}</p>
             </div>
@@ -234,9 +223,9 @@ export default function PaymentStep({
           </button>
           <button
             onClick={handlePayment}
-            disabled={isProcessing}
+            disabled={isProcessing || isLoading}
             className={`flex-1 py-3 px-6 rounded-lg transition-colors ${
-              isProcessing
+              isProcessing || isLoading
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-violet-600 hover:bg-violet-700"
             } text-white`}
